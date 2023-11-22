@@ -27,9 +27,6 @@ class AdaptationModel(Model):
     def __init__(self, 
                  seed = None,
                  number_of_households = 25, # number of household agents
-                 # flood damage related: from Huizinga, de Moel --> damage factor
-                 # in dollar and adjusted for inflation to 2020 value
-                 max_damage_dol_per_sqm = 1216.65,
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
                  flood_map_choice='harvey',
                  # ### network related parameters ###
@@ -49,7 +46,6 @@ class AdaptationModel(Model):
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
-        self.max_damage_dol_per_sqm = max_damage_dol_per_sqm
 
         # network
         self.network = network # Type of network to be created
@@ -93,7 +89,7 @@ class AdaptationModel(Model):
                         # ... other reporters ...
                         }
         #set up the data collector 
-        self.datacollector = DataCollector(model_reporters=model_metrics,agent_reporters=agent_metrics)
+        self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
             
 
     def initialize_network(self):
