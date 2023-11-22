@@ -5,7 +5,7 @@ from shapely.geometry import Point
 from shapely import contains_xy
 
 # Import functions from functions.py
-from functions import generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
+from .functions import generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
 
 
 # Define the Households agent class
