@@ -12,6 +12,11 @@ from shapely import contains_xy
 from shapely import prepare
 import geopandas as gpd
 
+# Directories
+import os
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
+
 def set_initial_values(input_data, parameter, seed):
     """
     Function to set the values based on the distribution shown in the input data for each parameter.
@@ -65,8 +70,8 @@ def get_flood_map_data(flood_map):
     bound_b = flood_map.bounds.bottom
     return band, bound_l, bound_r, bound_t, bound_b
 
-shapefile_path = r'../input_data/model_domain/houston_model/houston_model.shp'
-floodplain_path = r'../input_data/floodplain/floodplain_area.shp'
+shapefile_path = os.path.join(BASE_DIR, r'input_data/model_domain/houston_model/houston_model.shp')
+floodplain_path = os.path.join(BASE_DIR, r'input_data/floodplain/floodplain_area.shp')
 
 # Model area setup
 map_domain_gdf = gpd.GeoDataFrame.from_file(shapefile_path)
