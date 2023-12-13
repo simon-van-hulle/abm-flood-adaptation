@@ -23,6 +23,8 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
 
+# class RiskModel:
+#     def AWR()
 
 # Define the AdaptationModel class
 class AdaptationModel(Model):
@@ -47,8 +49,20 @@ class AdaptationModel(Model):
         number_of_edges=3,
         # number of nearest neighbours for WS social network
         number_of_nearest_neighbours=5,
+        # adaptation cost
+        adaptation_cost=50,
+        information_abundance=0.5,
+        societal_risk=None, # FIXME
     ):
         super().__init__(seed=seed)
+
+        # Our stuff
+        self.adaptation_cost = adaptation_cost
+        self.information_abundance =information_abundance 
+        self.societal_risk = societal_risk
+        
+        # subsidy policy:
+        self.subsidy_policy = lambda household: 0
 
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
@@ -209,6 +223,7 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be
         estimated differently
         """
+    
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
