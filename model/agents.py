@@ -67,6 +67,58 @@ class Government(Agent):
     """
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+<<<<<<< Updated upstream
+=======
+        
+        self.societal_risk = None
+        
+    
+        
+    def update_spending(self):
+        
+        # How much did we spend in the last step
+        # Based on all the model parameters in the policy 
+        
+        # Check how much is spent on subsidies
+        
+        return 
+    
+    
+    def evaluate_risk(self):
+    
+        # Magic with the RBB
+        # Update societal risk
+        return 
+    
+    def poll():
+        
+        return 
+
+    def update_policy(self):
+        
+        # Update policies in the model based on societal risk
+        
+        # How much info do you provide?
+    
+        
+        # update information_abundance
+        
+        # update subsidy_level
+        
+        # Build dykes (very expensive)'
+        
+        
+        # Regulate, maybe later
+        
+            
+        
+        
+        
+        return
+
+    
+
+>>>>>>> Stashed changes
 
     def step(self):
         # The government agent doesn't perform any actions.
