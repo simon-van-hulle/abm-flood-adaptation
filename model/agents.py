@@ -29,6 +29,9 @@ class Wizard:
     max_initial_savings = 10
     house_vs_savings = 10
     avg_std_savings_per_step_vs_house = [0.01, 0.01]
+    avg_std_trustworthiness = [0.5, 0.1]
+    min_max_damage_estimation_factor = [0.8, 1.2]
+    
     # min_max_
 
 
@@ -41,10 +44,9 @@ class Households(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+
         self.is_adapted = False  # Initial adaptation status set to False
-        self.savings = random.uniform(
-            0, Wizard.max_initial_savings
-        )  # Initial savings set to a random value between 0 and 100
+        self.savings = random.uniform(0, Wizard.max_initial_savings)
         self.house_value = self.savings * Wizard.house_vs_savings
 
         # getting flood map values
@@ -53,34 +55,50 @@ class Households(Agent):
         self.location = Point(loc_x, loc_y)
 
         # Check whether the location is within floodplain
-        self.in_floodplain = False
-
-        if contains_xy(geom=floodplain_multipolygon, x=self.location.x, y=self.location.y):
-            self.in_floodplain = True
+        self.in_floodplain = contains_xy(geom=floodplain_multipolygon, x=self.location.x, y=self.location.y)
 
         # Get the estimated flood depth at those coordinates.
         # the estimated flood depth is calculated based on the flood map (i.e., past data) so this is not the actual flood depth
         # Flood depth can be negative if the location is at a high elevation --> Made zero
 
         # TODO This might become dynamic if building is include
-        self.flood_depth_estimated = max(
+        self.flood_depth_theoretical = max(
             get_flood_depth(corresponding_map=model.flood_map, location=self.location, band=model.band_flood_img), 0
         )
-
-        # calculate the estimated flood damage given the estimated flood depth. Flood damage is a factor between 0 and 1
-        self.flood_damage_theoretical = calculate_basic_flood_damage(flood_depth=self.flood_depth_estimated)
 
         # Add an attribute for the actual flood depth. This is set to zero at the beginning of the simulation since there is not flood yet
         # and will update its value when there is a shock (i.e., actual flood). Shock happens at some point during the simulation
         self.flood_depth_actual = 0
 
-        # calculate the actual flood damage given the actual flood depth. Flood damage is a factor between 0 and 1
-        self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
-
         # Rationality of the agent
-        # self.flood_damage_estimated = self.flood_damage_theoretical * random.uniform()
+        self.flood_damage_estimated = self.flood_damage_theoretical * random.uniform(
+            *Wizard.min_max_damage_estimation_factor
+        )
         self.risk_aversion = random.random()
         self.rationality = random.random()
+
+    @property
+    def flood_damage_theoretical(self):
+        "Factor between 0 and 1"
+        return calculate_basic_flood_damage(flood_depth=self.flood_depth_theoretical)
+    
+    def flood_damage_estimated(self):
+        return 
+
+    @property
+    def flood_damage_actual(self):
+        "Factor between 0 and 1"
+        return calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
+
+    @property
+    def friends(self):
+        return self.model.grid.get_neighbors(self.pos, include_center=False)
+
+    # Function to count friends who can be influencial.
+    def count_friends(self, radius):
+        """Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial"""
+        friends = self.model.grid.get_neighborhood(self.pos, include_center=False, radius=radius)
+        return len(friends)
 
     def save(self):
         # Add some savings based on the value of the house
@@ -93,7 +111,7 @@ class Households(Agent):
 
         # Update estimated damage
         # Update estimated likelihood
-
+        
         pass
 
     def interact(self):
@@ -106,6 +124,12 @@ class Households(Agent):
         # Update estimated damage
         # Update estimated likelihood
         # Update risk aversion,
+        
+        for friend in self.friends:
+            
+            trustworthiness = max( random.normalvariate(*Wizard.avg_std_trustworthiness), 0)
+            self.risk_aversion += trustworthiness * (friend.risk_aversion - self.risk_aversion)            
+        
         pass
 
     def do_adaptation(self):
@@ -123,12 +147,6 @@ class Households(Agent):
             and random.random() < self.rationality
         ):
             self.is_adapted = True  # Agent adapts to flooding
-
-    # Function to count friends who can be influencial.
-    def count_friends(self, radius):
-        """Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial"""
-        friends = self.model.grid.get_neighborhood(self.pos, include_center=False, radius=radius)
-        return len(friends)
 
     def step(self):
         self.save()

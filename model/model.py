@@ -227,9 +227,7 @@ class AdaptationModel(Model):
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
-                # calculate the actual flood damage given the actual flood depth
-                agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
+                agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_theoretical
 
         # Collect data and advance the model by one step
         self.datacollector.collect(self)

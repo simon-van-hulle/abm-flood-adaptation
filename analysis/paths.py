@@ -7,3 +7,4 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 FIG_DIR = os.path.join(OUTPUT_DIR, "figures")
 
 sys.path.append(BASE_DIR)
+sys.path.append(CURRENT_DIR)
