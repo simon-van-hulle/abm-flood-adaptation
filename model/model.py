@@ -100,11 +100,13 @@ class AdaptationModel(Model):
         }
 
         agent_metrics = {
-            "FloodDepthEstimated": "flood_depth_estimated",
+            "FloodDepthTheoretical": "flood_depth_theoretical",
             "FloodDamageEstimated": "flood_damage_estimated",
             "FloodDepthActual": "flood_depth_actual",
             "FloodDamageActual": "flood_damage_actual",
             "IsAdapted": "is_adapted",
+            "RiskAversion": "risk_aversion",
+            "Savings": "savings",
             "FriendsCount": lambda a: a.count_friends(radius=1),
             "location": "location",
             # ... other reporters ...
@@ -224,7 +226,7 @@ class AdaptationModel(Model):
         estimated differently
         """
     
-        if self.schedule.steps == 5:
+        if self.schedule.steps == 10:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
                 agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_theoretical

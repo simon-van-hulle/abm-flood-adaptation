@@ -168,3 +168,10 @@ def calculate_basic_flood_damage(flood_depth):
         flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
     return flood_damage
 
+
+
+def sigmoid(x):
+    return  1/(1 + np.exp(-x)) 
+
+def sigminv(x):
+    return np.log(x/(1-x))

@@ -5,12 +5,7 @@ from shapely.geometry import Point
 from shapely import contains_xy
 
 # Import functions from functions.py
-from .functions import (
-    generate_random_location_within_map_domain,
-    get_flood_depth,
-    calculate_basic_flood_damage,
-    floodplain_multipolygon,
-)
+from .functions import *
 
 """
 Some assumptions:
@@ -29,9 +24,12 @@ class Wizard:
     max_initial_savings = 10
     house_vs_savings = 10
     avg_std_savings_per_step_vs_house = [0.01, 0.01]
-    avg_std_trustworthiness = [0.5, 0.1]
+    avg_std_trustworthiness = [0.05, 0.2]
     min_max_damage_estimation_factor = [0.8, 1.2]
-    
+    min_max_rationality = [0., 1.]
+    min_max_initial_risk_aversion = [0., 1.]
+    min_risk_aversion = 0.03
+
     # min_max_
 
 
@@ -74,16 +72,17 @@ class Households(Agent):
         self.flood_damage_estimated = self.flood_damage_theoretical * random.uniform(
             *Wizard.min_max_damage_estimation_factor
         )
-        self.risk_aversion = random.random()
-        self.rationality = random.random()
+        self.risk_aversion = random.uniform(*Wizard.min_max_initial_risk_aversion)
+        self.rationality = random.uniform(*Wizard.min_max_rationality)
+        self.trustworthiness_of_friends = [random.normalvariate(*Wizard.avg_std_trustworthiness) for i in range(100)]
 
     @property
     def flood_damage_theoretical(self):
         "Factor between 0 and 1"
         return calculate_basic_flood_damage(flood_depth=self.flood_depth_theoretical)
-    
+
     def flood_damage_estimated(self):
-        return 
+        return
 
     @property
     def flood_damage_actual(self):
@@ -111,7 +110,7 @@ class Households(Agent):
 
         # Update estimated damage
         # Update estimated likelihood
-        
+
         pass
 
     def interact(self):
@@ -124,12 +123,21 @@ class Households(Agent):
         # Update estimated damage
         # Update estimated likelihood
         # Update risk aversion,
-        
-        for friend in self.friends:
+
+        for i, friend in enumerate(self.friends):
+            trustworthiness = self.trustworthiness_of_friends[i]
+            # trustworthiness =max(0, random.normalvariate(*Wizard.avg_std_trustworthiness))
+            # self.risk_aversion += trustworthiness * (friend.risk_aversion + self.risk_aversion) / 2
             
-            trustworthiness = max( random.normalvariate(*Wizard.avg_std_trustworthiness), 0)
-            self.risk_aversion += trustworthiness * (friend.risk_aversion - self.risk_aversion)            
-        
+            self.risk_aversion += trustworthiness * (friend.risk_aversion - self.risk_aversion)
+            self.risk_aversion = max(min(self.risk_aversion, (1 - Wizard.min_risk_aversion)), Wizard.min_risk_aversion)
+            
+            # siginv_risk_averse = sigminv(friend.risk_aversion)  +  trustworthiness * (sigminv(friend.risk_aversion) - sigminv(self.risk_aversion))
+            # self.risk_aversion = sigmoid(siginv_risk_averse)
+            
+            # trustworthiness = random.normalvariate(*Wizard.avg_std_trustworthiness)
+            # self.risk_aversion =  max(min(trustworthiness * (friend.risk_aversion - self.risk_aversion), 1), 0)
+
         pass
 
     def do_adaptation(self):
@@ -142,11 +150,12 @@ class Households(Agent):
         estimated_money_damage = self.flood_damage_theoretical * self.house_value
 
         if (
-            estimated_money_damage > self.risk_aversion
+            self.risk_aversion * estimated_money_damage >  (1 - self.risk_aversion) * self.model.adaptation_cost
             and self.savings > self.model.adaptation_cost
             and random.random() < self.rationality
         ):
             self.is_adapted = True  # Agent adapts to flooding
+            self.savings -= self.model.adaptation_cost  # Agent pays for adaptation
 
     def step(self):
         self.save()
@@ -205,7 +214,9 @@ class Government(Agent):
     def step(self):
         # The government agent doesn't perform any actions.
 
-        pass
+        self.evaluate_risk()
+        self.update_policy()
+        self.update_spending()
 
 
 # More agent classes can be added here, e.g. for insurance agents.

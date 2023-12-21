@@ -39,6 +39,7 @@ def savefig(filename, *dirs, **kwargs):
         thedir = os.path.join(thedir, dir)
         if not os.path.exists(thedir):
             os.makedirs(thedir)
+    plt.tight_layout()
     plt.savefig(os.path.join(thedir, filename), **kwargs)
     LOG(f"Saved figure to {thedir}/{filename}")
 
