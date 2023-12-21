@@ -8,7 +8,7 @@ import networkx as nx
 plt.style.use("./model/myBmh.mplstyle")
 
 
-HOUSEHOLDS = 100
+HOUSEHOLDS = 10
 N_STEPS = 100
 
 # Initialize the Adaptation Model with 50 household agents.
