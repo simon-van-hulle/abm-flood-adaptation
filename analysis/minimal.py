@@ -5,11 +5,15 @@ from model import utils
 import matplotlib.pyplot as plt
 import networkx as nx
 
+
+# Import seaborn
+import seaborn as sns
+
+
 plt.style.use("./model/myBmh.mplstyle")
 
-
-HOUSEHOLDS = 10
-N_STEPS = 100
+HOUSEHOLDS = 100
+N_STEPS = 80
 
 # Initialize the Adaptation Model with 50 household agents.
 model = AdaptationModel(
@@ -35,11 +39,19 @@ plt.close("all")
 agent_data = model.datacollector.get_agent_vars_dataframe()
 model_data = model.datacollector.get_model_vars_dataframe()
 
+agent_data.to_pickle(f"{OUTPUT_DIR}/agent_data.pkl")
+
 # agent_data["color"] = agent_data["IsAdapted"].apply(lambda x: "k" if x else "red")
+
+# sns.set_theme("paper", "whitegrid", font_scale=1.5)
+sns.set_style("whitegrid")
+# sns.pairplot(agent_data)
+# sns.jointplot(data=agent_data, x="RiskAversion", y="Savings", hue="IsAdapted", alpha=0.5)
+utils.savefig("jointplot.pdf", FIG_DIR, "demo")    
 
 for key in model_data.keys():
     plt.figure()
-    plt.plot(model_data.index.values, model_data[key])
+    plt.plot(model_data.index.values, model_data[key], ".-", linewidth=0.5)
     plt.xlabel("Step")
     plt.ylabel(key)
     utils.savefig(f"{key}.pdf", FIG_DIR, "demo", "model")
@@ -48,7 +60,7 @@ for key in model_data.keys():
 for key in agent_data.keys():
     try:
         plt.figure()
-        plt.plot(agent_data.loc[:, key].to_numpy().reshape(N_STEPS, -1), ".-", linewidth=0.5, markersize=1)
+        plt.plot(agent_data.loc[:, key].to_numpy().reshape(N_STEPS, -1), ".-", linewidth=0.5, markersize=1, alpha=0.5)
         plt.xlabel("Step")
         plt.ylabel(key)
         utils.savefig(f"{key}.pdf", FIG_DIR, "demo", "agents")

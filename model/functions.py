@@ -17,6 +17,7 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
 
+
 def set_initial_values(input_data, parameter, seed):
     """
     Function to set the values based on the distribution shown in the input data for each parameter.
@@ -175,3 +176,10 @@ def sigmoid(x):
 
 def sigminv(x):
     return np.log(x/(1-x))
+
+def lognormal_cdf(x, mu, sigma):
+    if x == 0:
+        x = np.nextafter(x, 1)
+    return 0.5 + 0.5 * math.erf((np.log(x) - mu) / (sigma * np.sqrt(2)))
+
+
