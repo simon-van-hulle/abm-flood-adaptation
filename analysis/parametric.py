@@ -4,6 +4,7 @@ from model import utils
 from pandas import DataFrame
 import numpy as np
 import os
+from functools import partial
 
 from ema_workbench import (
     ReplicatorModel,
@@ -15,6 +16,7 @@ from ema_workbench import (
     perform_experiments,
     save_results,
     ema_logging,
+    Policy,
 )
 
 HOUSEHOLDS = 100
@@ -23,17 +25,17 @@ N_STEPS = 80
 print(OUTPUT_DIR)
 
 
-def model_adaptation( initial_adaptation_cost, output_dir="tmp"):
-    
+def model_adaptation(initial_adaptation_cost, max_initial_savings=10, output_dir="tmp"):
     outputdir = os.path.join(OUTPUT_DIR, output_dir)
-    
+
     # Set parameters
     wizard = Wizard()
+    wizard.max_initial_savings = max_initial_savings
     wizard.initial_adaptation_cost = initial_adaptation_cost
 
     # Initialise the model
     model = AdaptationModel(number_of_households=HOUSEHOLDS, wizard=wizard)
-    
+
     #  Run the model
     for step in range(N_STEPS):
         model.step()
@@ -42,9 +44,8 @@ def model_adaptation( initial_adaptation_cost, output_dir="tmp"):
 
     # os.mkdir(outputdir)
     # model_data.to_pickle(f"{outputdir}/model_data.pkl")
-    
-    return {"TotalAdapted": model_data["TotalAdaptedHouseholds"].to_list()}
 
+    return {"TotalAdapted": model_data["TotalAdaptedHouseholds"].to_list()}
 
 
 if __name__ == "__main__":
@@ -66,14 +67,21 @@ if __name__ == "__main__":
 
     model.replications = 2
 
+    policies = [
+        Policy("Poor", function=partial(model_adaptation, max_initial_savings=10)),
+        Policy("Rich", function=partial(model_adaptation, max_initial_savings=100)),
+        Policy("Richest", function=partial(model_adaptation, max_initial_savings=1000)),
+    ]
+
     # Run experiments with the aforementioned parameters and outputs
-    results = perform_experiments(models=model, scenarios=3)
+    results = perform_experiments(models=model, scenarios=3, policies=policies)
 
     # Get the results
     experiments, outcomes = results
 
-    DataFrame(experiments).to_pickle(f"{OUTPUT_DIR}/experiments.pkl")
+    save_results(results, f"{OUTPUT_DIR}/temporary.tar.gz")
 
-    for key in outcomes:
-        np.save(os.path.join(OUTPUT_DIR, f"{key}.npy"), outcomes[key])
+    # DataFrame(experiments).to_pickle(f"{OUTPUT_DIR}/experiments.pkl")
 
+    # for key in outcomes:
+    #     np.save(os.path.join(OUTPUT_DIR, f"{key}.npy"), outcomes[key])
