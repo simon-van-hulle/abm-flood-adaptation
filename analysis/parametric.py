@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ]
 
     # Run experiments with the aforementioned parameters and outputs
-    results = perform_experiments(models=model, scenarios=3, policies=policies)
+    results = perform_experiments(models=model, scenarios=5, policies=policies)
 
     # Get the results
     experiments, outcomes = results
