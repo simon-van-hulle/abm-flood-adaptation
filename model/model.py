@@ -32,14 +32,14 @@ class Wizard:
     """
     Class to store all magic numbers. For traceability and easy access.
     """
-    def __init__(self):
+    def __init__(self, government_adaptation_strategies=None):
         self.max_initial_savings = 100
         self.house_vs_savings = 10
         self.avg_std_savings_per_step_vs_house = [0.01, 0.01]
         self.avg_std_trustworthiness = [0.1, 0.2]
         self.avg_std_trustworthiness_governnment = [0.2, 0.1]
         self.min_max_damage_estimation_factor = [0, 1]
-        self.min_max_rationality = [0.0, 1.0]
+        self.min_max_rationality = [0.4, 1.0]
         self.min_max_initial_risk_aversion = [0.0, 1.0]
         self.min_risk_aversion = 0.03
         self.min_max_actual_depth_factor = [0.5, 1.2]
@@ -47,7 +47,8 @@ class Wizard:
         self.initial_adaptation_cost = 100
         self.initial_information_abundance = 0.1
         self.initial_societal_risk = 0.1
-        self.steps_with_flood = [5, 55]
+        self.steps_with_flood = [15, 55]
+        self.government_adaptation_strategies = government_adaptation_strategies or ["subsidy", "information", "dikes"]
 
 
 
@@ -83,6 +84,7 @@ class AdaptationModel(Model):
         self.information_abundance = self.wizard.initial_information_abundance
         self.societal_risk = self.wizard.initial_societal_risk
         self.steps_with_flood = self.wizard.steps_with_flood
+        self.government_adaptation_strategies= self.wizard.government_adaptation_strategies
 
         # subsidy policy:
         self.subsidy_policy = lambda household: 0
@@ -113,16 +115,18 @@ class AdaptationModel(Model):
             household = Households(unique_id=i, model=self)
             self.schedule.add(household)
             self.grid.place_agent(agent=household, node_id=node)
+        households = self.schedule.agents
 
         # Add government
-        self.schedule.add(Government(number_of_households+1, self))
+        self.schedule.add(Government(unique_id=number_of_households+1, model=self, households=households))
 
         # You might want to create other agents here, e.g. insurance agents.
 
         # Data collection setup to collect data
         model_metrics = {
-            "TotalAdaptedHouseholds": self.total_adapted_households,
+            "TotalAdapted": self.total_adapted_households,
             "AverageRiskAversion": self.average_risk_aversion,
+            "AverageEstimationFactor": self.average_estimation_factor,
             "AdaptationCost": "adaptation_cost",
             "InformationAbundance": "information_abundance",
             "SocietalRisk": "societal_risk",
@@ -224,6 +228,11 @@ class AdaptationModel(Model):
         """Return the average risk aversion of all households."""
         risk_aversion = sum([agent.risk_aversion for agent in self.schedule.agents if isinstance(agent, Households)])
         return risk_aversion / self.number_of_households
+
+    def average_estimation_factor(self):
+        """Return the average estimation factor of all households."""
+        estimation_factor = sum([agent.flood_damage_estimation_factor for agent in self.schedule.agents if isinstance(agent, Households)])
+        return estimation_factor / self.number_of_households
 
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()

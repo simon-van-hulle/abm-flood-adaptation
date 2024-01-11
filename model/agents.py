@@ -18,11 +18,6 @@ Some assumptions:
 """
 
 
-
-
-
-
-
 class Households(Agent):
     """
     An agent representing a household in the model.
@@ -34,7 +29,7 @@ class Households(Agent):
         super().__init__(unique_id, model)
 
         self.wizard = model.wizard
-        
+
         self.is_adapted = False  # Initial adaptation status set to False
         self.savings = random.uniform(0, self.wizard.max_initial_savings)
         self.house_value = self.savings * self.wizard.house_vs_savings
@@ -61,7 +56,9 @@ class Households(Agent):
         self.risk_aversion = random.uniform(*self.wizard.min_max_initial_risk_aversion)
         self.flood_damage_estimation_factor = random.uniform(*self.wizard.min_max_damage_estimation_factor)
         self.rationality = random.uniform(*self.wizard.min_max_rationality)
-        self.trustworthiness_of_friends = [random.normalvariate(*self.wizard.avg_std_trustworthiness) for i in range(100)]
+        self.trustworthiness_of_friends = [
+            random.normalvariate(*self.wizard.avg_std_trustworthiness) for i in range(100)
+        ]
         self.trustworthiness_of_government = random.normalvariate(*self.wizard.avg_std_trustworthiness_governnment)
 
     @property
@@ -94,7 +91,6 @@ class Households(Agent):
     @property
     def friends(self):
         return self.model.grid.get_neighbors(self.pos, include_center=False)
-
 
     # Function to count friends who can be influencial.
     def count_friends(self, radius):
@@ -136,7 +132,9 @@ class Households(Agent):
         for i, friend in enumerate(self.friends):
             trustworthiness = self.trustworthiness_of_friends[i]
             self.risk_aversion += trustworthiness * (friend.risk_aversion - self.risk_aversion)
-            self.risk_aversion = max(min(self.risk_aversion, (1 - self.wizard.min_risk_aversion)), self.wizard.min_risk_aversion)
+            self.risk_aversion = max(
+                min(self.risk_aversion, (1 - self.wizard.min_risk_aversion)), self.wizard.min_risk_aversion
+            )
 
             # Weird ideas
 
@@ -160,19 +158,25 @@ class Households(Agent):
 
         estimated_money_damage = self.flood_damage_estimated * self.house_value
 
+        adaptation_cost = self.model.adaptation_cost - self.model.subsidy_policy(self)
+
         if (
-            self.risk_aversion * estimated_money_damage > (1 - self.risk_aversion) * self.model.adaptation_cost
-            and self.savings > self.model.adaptation_cost
+            self.risk_aversion * estimated_money_damage > (1 - self.risk_aversion) * adaptation_cost
+            and self.savings > adaptation_cost
             and random.random() < self.rationality
         ):
             self.is_adapted = True  # Agent adapts to flooding
-            self.savings -= self.model.adaptation_cost  # Agent pays for adaptation
-   
+            self.savings -= adaptation_cost  # Agent pays for adaptation
+
     def flood_occurs(self):
-        
-        self.flood_depth_actual = random.uniform(*self.wizard.min_max_actual_depth_factor) * self.flood_depth_theoretical
+        self.flood_depth_actual = (
+            random.uniform(*self.wizard.min_max_actual_depth_factor) * self.flood_depth_theoretical
+        )
         self.savings -= self.flood_damage_actual * self.house_value
-        self.risk_aversion += min(1-self.risk_aversion, self.flood_damage_actual*random.normalvariate(*self.wizard.avg_std_flood_influence_risk_aversion))
+        self.risk_aversion += min(
+            1 - self.risk_aversion,
+            self.flood_damage_actual * random.normalvariate(*self.wizard.avg_std_flood_influence_risk_aversion),
+        )
 
     def step(self):
         self.save()
@@ -180,41 +184,51 @@ class Households(Agent):
         self.interact()
         self.do_adaptation()
 
+
 ###########################################################################
 
 """
 Some notes:
     "The functions that do not use self can also be redefined outside the class for versatility towards better models"
 """
+
+
 def probability_drowning(depth):
     return lognormal_cdf(depth, 0.5, 0.8)
 
-# FN curve, expected value of the number of fatalities, risk integral, total risk 
+
+# FN curve, expected value of the number of fatalities, risk integral, total risk
+
 
 class RiskModel:
-    def __init__(self, model):
+    def __init__(self, model, agents):
         self.model = model
+        self.agents = agents
         self.function_flood_fatality_per_depth = probability_drowning
-    
-    
+
     def get_individual_risk_per_year(self, household):
         IR = self.function_flood_fatality_per_depth(household.flood_depth_theoretical) * self.model.floods_per_year
-        IR *= (not household.is_adapted)
         return IR
-    
+
     def get_societal_risk_per_year(self):
-        return sum([self.get_individual_risk_per_year(agent) for agent in self.model.get_households()]) / self.model.number_of_households
-    
-    
+        "TODO: include area stuff"
+        return sum([self.get_individual_risk_per_year(agent) for agent in self.agents])
+
     def get_probability_more_than_k_fatalities(self, k):
         N = self.model.number_of_households
-        individual_risks = [self.get_individual_risk_per_year(agent) for agent in self.model.get_households()]    
+        individual_risks = [self.get_individual_risk_per_year(agent) for agent in self.agents]
         avg_individual_risk = np.mean(individual_risks)
         self.get_individual_risk_per_year(self.model.schedule.agents[0])
         return 1 - binom.cdf(k, N, avg_individual_risk)
-    
+
+    def societal_risk_exceeds_threshold(self, method, threshold):
+        
+        if method == "ExpectedValue":
+            return self.get_societal_risk_per_year() > threshold
+
 
 ###########################################################################
+
 
 # Define the Government agent class
 class Government(Agent):
@@ -225,26 +239,27 @@ class Government(Agent):
     # Ideas
     # - Do a poll
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, households):
         super().__init__(unique_id, model)
 
-        self.risk_model = RiskModel(model)
+        self.households = households
+        self.n_households = len(self.households)
+        self.risk_model = RiskModel(model, households)
 
     def update_spending(self):
         # How much did we spend in the last step
         # Based on all the model parameters in the policy
 
         # Check how much is spent on subsidies
-        
+
         return
 
     def evaluate_risk(self):
         # Magic with the RBB
         # Update societal risk
-        
+
         self.model.societal_risk = self.risk_model.get_societal_risk_per_year()
-        
-        
+
         return
 
     def poll():
@@ -256,29 +271,44 @@ class Government(Agent):
         # How much info do you provide?
 
         # update information_abundance
-        
-        y_abundance = 0.1
-        max_societal_risk = 0.1
-        self.model.information_abundance = y_abundance + self.model.societal_risk * (( 1 - y_abundance) / max_societal_risk)
+        # TODO:THIS IS MAGIC - FIX THE NUMBERS
 
-    
-        # self.model.information_abundance = 1 - self.model.societal_risk
         
-        # update subsidy_level
+        if "information" in self.model.government_adaptation_strategies:
+            
+            self.model.societal_risk = self.risk_model.get_societal_risk_per_year() 
+            y_abundance = 0.2
+            max_societal_risk = 0.1
+            self.model.information_abundance = y_abundance + self.model.societal_risk * (( 1 - y_abundance) / max_societal_risk)
+            
+            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
+            #     self.model.information_abundance = 1
+            # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.005 * self.n_households):
+            #     self.model.information_abundance = 0.5
         
 
+        # # update subsidy_level
+        if "subsidy" in self.model.government_adaptation_strategies:       
+              
+            if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
+                self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
+          
+            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.1 * self.n_households):
+            #     self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
+
+            # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.05 * self.n_households):
+            #     self.model.subsidy_policy = lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
+                
         # Build dykes (very expensive)'
 
         # Regulate, maybe later
 
         # Build dykes
-        
-        
-        # self.model.information_abundance = 
-        
+
+        # self.model.information_abundance =
 
         return
-    
+
     def flood_occurs(self):
         pass
 
