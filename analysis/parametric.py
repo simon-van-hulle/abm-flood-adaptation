@@ -19,7 +19,7 @@ from ema_workbench import (
     Policy,
 )
 
-HOUSEHOLDS = 100
+HOUSEHOLDS = 200
 N_STEPS = 80
 
 print(OUTPUT_DIR)
@@ -68,13 +68,13 @@ if __name__ == "__main__":
         ArrayOutcome("TotalAdapted"),
     ]
 
-    model.replications = 2
+    model.replications = 1
 
     policies = [
         Policy("NoPolicy", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=['a']))),
         Policy("Info", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=["information"]))),
         Policy("Subsidy", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=["subsidy"]))),
-        # Policy("Info + Subsidy", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=["information", "subsidy"]))),
+        Policy("Info + Subsidy", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=["information", "subsidy"]))),
         # Policy("Info + Subsidy + Dikes", function=partial(model_adaptation, wizard=Wizard(government_adaptation_strategies=["information", "subsidy", "dikes"]))),
     ]
 

@@ -1,23 +1,48 @@
-from paths import *
+import os 
+import sys
+CURRENT_DIR = os.path.dirname(os.path.realpath("__file__"))
+BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+FIG_DIR = os.path.join(OUTPUT_DIR, "figures")
+
+sys.path.append(BASE_DIR)
+sys.path.append(CURRENT_DIR)
+
 import pandas as pd
 from model.model import AdaptationModel
+import model.model as model
 from model import utils
 import matplotlib.pyplot as plt
 import networkx as nx
+
+
 
 
 # Import seaborn
 import seaborn as sns
 
 
-plt.style.use("./model/myBmh.mplstyle")
+# plt.style.use("./model/myBmh.mplstyle")
+# plt.style.use("model/myBmh.mplstyle")
 
 HOUSEHOLDS = 100
 N_STEPS = 80
 
+# initial_savings = 100
+# avg_savings_per_step_vs_house = 0.1
+# avg_trustworthiness_government = 0.2
+# min_initial_risk_aversion = 0.1
+# max_initial_risk_aversion = 0.9
+
+wizard = model.Wizard()
+wizard.max_initial_savings = 100 # U
+wizard.avg_std_savings_per_step_vs_house = [0.01, 0.01] # U
+wizard.avg_std_trustworthiness_governnment = [0.2, 0.1] # U  
+wizard.min_max_initial_risk_aversion = [0.0, 1.0] # U
+
 # Initialize the Adaptation Model with 50 household agents.
 model = AdaptationModel(
-    number_of_households=HOUSEHOLDS, flood_map_choice="harvey", network="watts_strogatz"
+    number_of_households=HOUSEHOLDS, flood_map_choice="harvey", network="watts_strogatz", wizard=wizard
 )  # flood_map_choice can be "harvey", "100yr", or "500yr"
 
 # Generate the initial plots at step 0.
