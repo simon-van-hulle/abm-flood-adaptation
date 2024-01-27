@@ -33,6 +33,8 @@ class Households(Agent):
         self.is_adapted = False  # Initial adaptation status set to False
         self.savings = random.uniform(0, self.wizard.max_initial_savings)
         self.house_value = self.savings * self.wizard.house_vs_savings
+        self.government_subsidy_money = 0
+        self.government_damage_money = 0
 
         # getting flood map values
         # Get a random location on the map
@@ -158,7 +160,8 @@ class Households(Agent):
 
         estimated_money_damage = self.flood_damage_estimated * self.house_value
 
-        adaptation_cost = self.model.adaptation_cost - self.model.subsidy_policy(self)
+        subsidy_money =  self.model.subsidy_policy(self)
+        adaptation_cost = self.model.adaptation_cost - subsidy_money
 
         if (
             self.risk_aversion * estimated_money_damage > (1 - self.risk_aversion) * adaptation_cost
@@ -167,12 +170,15 @@ class Households(Agent):
         ):
             self.is_adapted = True  # Agent adapts to flooding
             self.savings -= adaptation_cost  # Agent pays for adaptation
+            self.government_subsidy_money += subsidy_money # Government pays for adaptation
 
     def flood_occurs(self):
         self.flood_depth_actual = (
             random.uniform(*self.wizard.min_max_actual_depth_factor) * self.flood_depth_theoretical
         )
-        self.savings -= self.flood_damage_actual * self.house_value
+        flood_cost = self.flood_damage_actual * self.house_value
+        self.government_damage_money += flood_cost 
+        self.savings -= flood_cost
         self.risk_aversion += min(
             1 - self.risk_aversion,
             self.flood_damage_actual * random.normalvariate(*self.wizard.avg_std_flood_influence_risk_aversion),
@@ -245,13 +251,23 @@ class Government(Agent):
         self.households = households
         self.n_households = len(self.households)
         self.risk_model = RiskModel(model, households)
+        self.total_budget = 0
+        self.subsidy_budget = 0
+        self.damage_budget = 0
+        self.information_budget = 0
+
 
     def update_spending(self):
         # How much did we spend in the last step
         # Based on all the model parameters in the policy
 
         # Check how much is spent on subsidies
-
+        self.information_budget += self.model.information_abundance * self.model.information_cost
+        self.subsidy_budget = sum([household.government_subsidy_money for household in self.households])
+        self.damage_budget = sum([household.government_damage_money for household in self.households])
+        
+        self.total_budget = self.subsidy_budget + self.subsidy_budget + self.damage_budget
+        
         return
 
     def evaluate_risk(self):
@@ -277,21 +293,17 @@ class Government(Agent):
         if "information" in self.model.government_adaptation_strategies:
             
             self.model.societal_risk = self.risk_model.get_societal_risk_per_year() 
-            y_abundance = 0.2
-            max_societal_risk = 0.1
-            self.model.information_abundance = y_abundance + self.model.societal_risk * (( 1 - y_abundance) / max_societal_risk)
-            
-            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
-            #     self.model.information_abundance = 1
-            # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.005 * self.n_households):
-            #     self.model.information_abundance = 0.5
-        
+            baseline_information_abundance = 0.2
+            max_societal_risk = 0.1  * self.n_households
+            self.model.information_abundance = baseline_information_abundance + self.model.societal_risk * (( 1 - baseline_information_abundance) / max_societal_risk)
 
-        # # update subsidy_level
         if "subsidy" in self.model.government_adaptation_strategies:       
               
             if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
-                self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
+                self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
+          
+            else:
+                self.model.subsidy_policy = lambda household : 0
           
             # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.1 * self.n_households):
             #     self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
@@ -299,13 +311,9 @@ class Government(Agent):
             # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.05 * self.n_households):
             #     self.model.subsidy_policy = lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
                 
-        # Build dykes (very expensive)'
-
-        # Regulate, maybe later
-
-        # Build dykes
-
-        # self.model.information_abundance =
+                
+        if "dikes" in self.model.government_adaptation_strategies:
+            pass
 
         return
 

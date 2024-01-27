@@ -33,20 +33,20 @@ class Wizard:
     Class to store all magic numbers. For traceability and easy access.
     """
     def __init__(self, government_adaptation_strategies=None):
-        self.max_initial_savings = 100
+        self.max_initial_savings = 100 # U
         self.house_vs_savings = 10
-        self.avg_std_savings_per_step_vs_house = [0.01, 0.01]
+        self.avg_std_savings_per_step_vs_house = [0.01, 0.01] # U
         self.avg_std_trustworthiness = [0.1, 0.2]
-        self.avg_std_trustworthiness_governnment = [0.2, 0.1]
+        self.avg_std_trustworthiness_governnment = [0.2, 0.1] # U  
         self.min_max_damage_estimation_factor = [0, 1]
         self.min_max_rationality = [0.4, 1.0]
-        self.min_max_initial_risk_aversion = [0.0, 1.0]
+        self.min_max_initial_risk_aversion = [0.0, 1.0] # U
         self.min_risk_aversion = 0.03
         self.min_max_actual_depth_factor = [0.5, 1.2]
         self.avg_std_flood_influence_risk_aversion = [0.5, 0.1]
-        self.initial_adaptation_cost = 100
+        self.initial_adaptation_cost = 100 #
         self.initial_information_abundance = 0.1
-        self.initial_societal_risk = 0.1
+        self.information_cost = 100 #
         self.steps_with_flood = [15, 55]
         self.government_adaptation_strategies = government_adaptation_strategies or ["subsidy", "information", "dikes"]
 
@@ -82,9 +82,9 @@ class AdaptationModel(Model):
         self.wizard = wizard
         self.adaptation_cost = self.wizard.initial_adaptation_cost
         self.information_abundance = self.wizard.initial_information_abundance
-        self.societal_risk = self.wizard.initial_societal_risk
         self.steps_with_flood = self.wizard.steps_with_flood
         self.government_adaptation_strategies= self.wizard.government_adaptation_strategies
+        self.information_cost = self.wizard.information_cost
 
         # subsidy policy:
         self.subsidy_policy = lambda household: 0
@@ -142,6 +142,10 @@ class AdaptationModel(Model):
             "IsAdapted": "is_adapted",
             "RiskAversion": "risk_aversion",
             "Savings": "savings",
+            "TotalBudget" : "total_budget",
+            "SubsidyBudget": "subsidy_budget",
+            "DamageBudget": "damage_budget",
+            "InformationBudget": "information_budget",
             # "FriendsCount": lambda a: a.count_friends(radius=1),
             "location": "location",
             # ... other reporters ...
