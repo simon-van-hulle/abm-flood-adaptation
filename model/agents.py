@@ -14,7 +14,6 @@ from .functions import *
 Some assumptions:
 * House values are a representation of the income in a household
 * The order of actions within one step does not matter (save, interact, ...)
-* One tick is 0.25 year
 * Money is in 
 """
 
@@ -199,15 +198,7 @@ Some notes:
     "The functions that do not use self can also be redefined outside the class for versatility towards better models"
 """
 
-
-# FN curve, expected value of the number of fatalities, risk integral, total risk
-
-
-# Assumptions
-# all risks are per epoch!
-# IR = Individual risk
-# SR = Societal risk
-# N = number of households
+# Risk model
 
 
 class RiskModel:
@@ -221,10 +212,16 @@ class RiskModel:
     * RI = Collective Risk Integral
     """
 
-    def __init__(self, model, agents, agent_type):
-        self.model = model
+    def __init__(self, agents, agent_type_filter=None, alpha=1, k_aversion_factor=1, Cx_function=lambda x: 1):
+        self.agent_type_filter = agent_type_filter
         self.agents = agents
-        self.agent_type = agent_type
+        if agent_type_filter is not None:
+            self.agents = [agent for agent in agents if type(agent) in agent_type_filter]
+        self.N_agents = len(self.agents)
+
+        self.alpha = alpha
+        self.k_aversion_factor = k_aversion_factor
+        self.Cx_function = Cx_function  # The scaling function defaults to 1
 
     def p_failure(self, agent):
         raise NotImplementedError("The risk model requires a function for the probability of failure.")
@@ -232,18 +229,24 @@ class RiskModel:
     def p_death_if_failure(self, agent):
         raise NotImplementedError("The risk model requires a function for the probability of death if a failure occurs")
 
-    def avg_Pdeath(self):
-        pass
+    def avg_p_death_if_failure(self):
+        return np.mean([self.p_death_if_failure(agent) for agent in self.agents])
 
     def f_N(self, x):
-        pass
+        return binom.pdf(x, self.N_agents, self.avg_p_death_if_failure())
 
-    def IR(self, household):
-        IR = self.p_death_if_failure(household) * self.p_failure(household)
-        return IR
+    def F_N(self, x):
+        return binom.cdf(x, self.N_agents, self.avg_p_death_if_failure())
+
+    def P_N(self, x):
+        return 1 - self.F_N(x)
+
+    def IR(self, agent):
+        return self.p_death_if_failure(agent) * self.p_failure(agent)
 
     def AWR(self):
-        pass
+        "The average weighted risk. Area aspects are included in the IR function"
+        return sum([self.IR(agent) for agent in self.agents])
 
     def SRI(self):
         pass
@@ -254,32 +257,22 @@ class RiskModel:
     def RI(self):
         pass
 
-    def get_societal_risk_per_year(self):
-        "TODO: include area stuff"
-        return sum([self.IR(agent) for agent in self.agents])
-
-    def get_probability_more_than_k_fatalities(self, k):
-        N = self.model.number_of_households
-        individual_risks = [self.IR(agent) for agent in self.agents]
-        avg_individual_risk = np.mean(individual_risks)
-        self.IR(self.model.schedule.agents[0])
-        return 1 - binom.cdf(k, N, avg_individual_risk)
-
     def societal_risk_exceeds_threshold(self, method, threshold):
         if method == "ExpectedValue":
-            return self.get_societal_risk_per_year() > threshold
+            return self.AWR() > threshold
 
 
 # Specific  functions for the flood model
 
 
 class FloodRiskModel(RiskModel):
-    def __init__(self, model, agents, agent_type=Households, **kwargs):
-        super().__init__(model, agents, agent_type=agent_type, **kwargs)
+    def __init__(self, model, agents, agent_type_filter=[Households], **kwargs):
+        super().__init__(agents, agent_type_filter=agent_type_filter, **kwargs)
+        self.model = model
 
     @override
     def p_failure(self, agent):
-        return self.model.floods_per_year / 4 # Epoch is 0.25 year
+        return self.model.floods_per_year * self.model.years_per_step 
 
     @override
     def p_death_if_failure(self, agent):
@@ -326,7 +319,7 @@ class Government(Agent):
         # Magic with the RBB
         # Update societal risk
 
-        self.model.societal_risk = self.risk_model.get_societal_risk_per_year()
+        self.model.societal_risk = self.risk_model.AWR()
 
         return
 
@@ -342,7 +335,7 @@ class Government(Agent):
         # TODO:THIS IS MAGIC - FIX THE NUMBERS
 
         if "information" in self.model.government_adaptation_strategies:
-            self.model.societal_risk = self.risk_model.get_societal_risk_per_year()
+            self.model.societal_risk = self.risk_model.AWR()
             baseline_information_abundance = 0.2
             max_societal_risk = 0.1 * self.n_households
             self.model.information_abundance = baseline_information_abundance + self.model.societal_risk * (

@@ -24,8 +24,6 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
 
-# class RiskModel:
-#     def AWR()
 
 @dataclass
 class Wizard:
@@ -74,6 +72,7 @@ class AdaptationModel(Model):
         number_of_edges=3,
         # number of nearest neighbours for WS social network
         number_of_nearest_neighbours=5,
+        years_per_step=0.25,
         wizard=Wizard(),
     ):
         super().__init__(seed=seed)
@@ -85,6 +84,7 @@ class AdaptationModel(Model):
         self.steps_with_flood = self.wizard.steps_with_flood
         self.government_adaptation_strategies= self.wizard.government_adaptation_strategies
         self.information_cost = self.wizard.information_cost
+        self.years_per_step = years_per_step
 
         # subsidy policy:
         self.subsidy_policy = lambda household: 0
