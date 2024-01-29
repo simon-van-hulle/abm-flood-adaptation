@@ -4,6 +4,7 @@ from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
 from scipy.stats import binom
+from typing import override
 
 # Import functions from functions.py
 from .functions import *
@@ -160,7 +161,7 @@ class Households(Agent):
 
         estimated_money_damage = self.flood_damage_estimated * self.house_value
 
-        subsidy_money =  self.model.subsidy_policy(self)
+        subsidy_money = self.model.subsidy_policy(self)
         adaptation_cost = self.model.adaptation_cost - subsidy_money
 
         if (
@@ -170,14 +171,14 @@ class Households(Agent):
         ):
             self.is_adapted = True  # Agent adapts to flooding
             self.savings -= adaptation_cost  # Agent pays for adaptation
-            self.government_subsidy_money += subsidy_money # Government pays for adaptation
+            self.government_subsidy_money += subsidy_money  # Government pays for adaptation
 
     def flood_occurs(self):
         self.flood_depth_actual = (
             random.uniform(*self.wizard.min_max_actual_depth_factor) * self.flood_depth_theoretical
         )
         flood_cost = self.flood_damage_actual * self.house_value
-        self.government_damage_money += flood_cost 
+        self.government_damage_money += flood_cost
         self.savings -= flood_cost
         self.risk_aversion += min(
             1 - self.risk_aversion,
@@ -199,38 +200,90 @@ Some notes:
 """
 
 
-def probability_drowning(depth):
-    return lognormal_cdf(depth, 0.5, 0.8)
-
-
 # FN curve, expected value of the number of fatalities, risk integral, total risk
 
 
+# Assumptions
+# all risks are per epoch!
+# IR = Individual risk
+# SR = Societal risk
+# N = number of households
+
+
 class RiskModel:
-    def __init__(self, model, agents):
+    """
+    A class that calculates the risk of flooding for the entire model.
+    * IR = Individual risk
+    * SR = Societal risk
+    * N = number of households
+    * AWR = Average Weighted Risk
+    * SRI = Scaled Risk Integral
+    * RI = Collective Risk Integral
+    """
+
+    def __init__(self, model, agents, agent_type):
         self.model = model
         self.agents = agents
-        self.function_flood_fatality_per_depth = probability_drowning
+        self.agent_type = agent_type
 
-    def get_individual_risk_per_year(self, household):
-        IR = self.function_flood_fatality_per_depth(household.flood_depth_theoretical) * self.model.floods_per_year
+    def p_failure(self, agent):
+        raise NotImplementedError("The risk model requires a function for the probability of failure.")
+
+    def p_death_if_failure(self, agent):
+        raise NotImplementedError("The risk model requires a function for the probability of death if a failure occurs")
+
+    def avg_Pdeath(self):
+        pass
+
+    def f_N(self, x):
+        pass
+
+    def IR(self, household):
+        IR = self.p_death_if_failure(household) * self.p_failure(household)
         return IR
+
+    def AWR(self):
+        pass
+
+    def SRI(self):
+        pass
+
+    def FN_curve(self):
+        pass
+
+    def RI(self):
+        pass
 
     def get_societal_risk_per_year(self):
         "TODO: include area stuff"
-        return sum([self.get_individual_risk_per_year(agent) for agent in self.agents])
+        return sum([self.IR(agent) for agent in self.agents])
 
     def get_probability_more_than_k_fatalities(self, k):
         N = self.model.number_of_households
-        individual_risks = [self.get_individual_risk_per_year(agent) for agent in self.agents]
+        individual_risks = [self.IR(agent) for agent in self.agents]
         avg_individual_risk = np.mean(individual_risks)
-        self.get_individual_risk_per_year(self.model.schedule.agents[0])
+        self.IR(self.model.schedule.agents[0])
         return 1 - binom.cdf(k, N, avg_individual_risk)
 
     def societal_risk_exceeds_threshold(self, method, threshold):
-        
         if method == "ExpectedValue":
             return self.get_societal_risk_per_year() > threshold
+
+
+# Specific  functions for the flood model
+
+
+class FloodRiskModel(RiskModel):
+    def __init__(self, model, agents, agent_type=Households, **kwargs):
+        super().__init__(model, agents, agent_type=agent_type, **kwargs)
+
+    @override
+    def p_failure(self, agent):
+        return self.model.floods_per_year / 4 # Epoch is 0.25 year
+
+    @override
+    def p_death_if_failure(self, agent):
+        return lognormal_cdf(agent.flood_depth_theoretical, 0.5, 0.8)
 
 
 ###########################################################################
@@ -250,12 +303,11 @@ class Government(Agent):
 
         self.households = households
         self.n_households = len(self.households)
-        self.risk_model = RiskModel(model, households)
+        self.risk_model = FloodRiskModel(model, households)
         self.total_budget = 0
         self.subsidy_budget = 0
         self.damage_budget = 0
         self.information_budget = 0
-
 
     def update_spending(self):
         # How much did we spend in the last step
@@ -265,9 +317,9 @@ class Government(Agent):
         self.information_budget += self.model.information_abundance * self.model.information_cost
         self.subsidy_budget = sum([household.government_subsidy_money for household in self.households])
         self.damage_budget = sum([household.government_damage_money for household in self.households])
-        
+
         self.total_budget = self.subsidy_budget + self.subsidy_budget + self.damage_budget
-        
+
         return
 
     def evaluate_risk(self):
@@ -289,29 +341,31 @@ class Government(Agent):
         # update information_abundance
         # TODO:THIS IS MAGIC - FIX THE NUMBERS
 
-        
         if "information" in self.model.government_adaptation_strategies:
-            
-            self.model.societal_risk = self.risk_model.get_societal_risk_per_year() 
+            self.model.societal_risk = self.risk_model.get_societal_risk_per_year()
             baseline_information_abundance = 0.2
-            max_societal_risk = 0.1  * self.n_households
-            self.model.information_abundance = baseline_information_abundance + self.model.societal_risk * (( 1 - baseline_information_abundance) / max_societal_risk)
+            max_societal_risk = 0.1 * self.n_households
+            self.model.information_abundance = baseline_information_abundance + self.model.societal_risk * (
+                (1 - baseline_information_abundance) / max_societal_risk
+            )
 
-        if "subsidy" in self.model.government_adaptation_strategies:       
-              
+        if "subsidy" in self.model.government_adaptation_strategies:
             if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
-                self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
-          
+                self.model.subsidy_policy = (
+                    lambda household: self.model.adaptation_cost * 0.5
+                    if household.savings < self.model.adaptation_cost
+                    else 0
+                )
+
             else:
-                self.model.subsidy_policy = lambda household : 0
-          
+                self.model.subsidy_policy = lambda household: 0
+
             # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.1 * self.n_households):
             #     self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
 
             # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.05 * self.n_households):
             #     self.model.subsidy_policy = lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
-                
-                
+
         if "dikes" in self.model.government_adaptation_strategies:
             pass
 
