@@ -1,3 +1,5 @@
+_modules/
+
 # Additional things
 .DS_Store
 figures

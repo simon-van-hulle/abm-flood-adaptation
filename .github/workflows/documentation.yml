@@ -1,16 +1,19 @@
-# name: documentation
+name: documentation
 
-# on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 # permissions:
 #   contents: write
 
-# jobs:
-#   docs:
-#     runs-on: ubuntu-latest
-#     steps:
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
 #       - uses: actions/checkout@v4
 #       - uses: actions/setup-python@v3
+      - name: Test
+        run: |
+          echo "Hello World"
 #       - name: Install dependencies
 #         run: |
 #           pip install sphinx sphinx_rtd_theme myst_parser typing
