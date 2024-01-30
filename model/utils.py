@@ -8,17 +8,35 @@ import networkx as nx
 ## Logging tools
 
 
-def NAME(var):
+def NAME(var: any) -> list[str]:
+    """
+    Utility to retrieve the name of a variable.
+
+    :param any var: any variable
+    :return list[str]: String representation of the variable name
+    """
     callers_local_vars = inspect.currentframe().f_back.f_back.f_locals.items()
     return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
 
-def LOG(*strings, separator=" "):
+def LOG(*strings, separator: str = " ") -> None:
+    """
+    Utility to print a log message.
+
+    :param str separator: separator to use between the *strings, defaults to " "
+    """
     message = separator.join(["[LOG]:", *strings])
     print(message)
 
 
-def LOGVAR(var, format="10.5f", space=20):
+def LOGVAR(var: any, format: str = "10.5f", space: int = 20):
+    """
+    Utility to log a single variable.
+
+    :param any var: any variable
+    :param str format: Format to print the value of the variable, defaults to "10.5f"
+    :param int space: space to leave for the variable, defaults to 20
+    """
     name = NAME(var)[0]
     extra = "\n" if type(var) == np.ndarray else ""
     try:
@@ -32,8 +50,12 @@ LV = LOGVAR
 ## Plotting tools
 
 
-def savefig(filename, *dirs, **kwargs):
-    """Save a figure with the given filename and directories"""
+def savefig(filename: str, *dirs, **kwargs) -> None:
+    """
+    Save a figure with the given filename and directories
+
+    :param str filename: name of the file (include extension - default png)
+    """
     thedir = "."
     for dir in dirs:
         thedir = os.path.join(thedir, dir)
@@ -44,9 +66,13 @@ def savefig(filename, *dirs, **kwargs):
     LOG(f"Saved figure to {thedir}/{filename}")
 
 
-# Define a function to plot agents on the network.
-# This function takes a matplotlib axes object and the model as inputs.
-def plot_network(ax, model):
+def plot_network(ax, model) -> None:
+    """
+    Define a function to plot agents on the network.
+
+    :param Axis ax: Matplotlib axis to plot on
+    :param Model model: Mesa model with appropriate parameters and agents
+    """
     # Calculate positions of nodes for the network plot.
     # The spring_layout function positions nodes using a force-directed algorithm,
     # which helps visualize the structure of the social network.
