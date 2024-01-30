@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model.model &mdash; Flood Adaptation 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Flood Adaptation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Flood Adaptation and Societal Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">General API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Flood Adaptation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">model.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for model.model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Importing necessary libraries</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">mesa</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Agent</span>
+<span class="kn">from</span> <span class="nn">mesa.time</span> <span class="kn">import</span> <span class="n">RandomActivation</span>
+<span class="kn">from</span> <span class="nn">mesa.space</span> <span class="kn">import</span> <span class="n">NetworkGrid</span>
+<span class="kn">from</span> <span class="nn">mesa.datacollection</span> <span class="kn">import</span> <span class="n">DataCollector</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">rasterio</span> <span class="k">as</span> <span class="nn">rs</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Import the agent class(es) from agents.py</span>
+<span class="kn">from</span> <span class="nn">.agents</span> <span class="kn">import</span> <span class="n">Households</span><span class="p">,</span> <span class="n">Government</span>
+
+<span class="c1"># Import functions from functions.py</span>
+<span class="kn">from</span> <span class="nn">.functions</span> <span class="kn">import</span> <span class="n">get_flood_map_data</span><span class="p">,</span> <span class="n">calculate_basic_flood_damage</span>
+<span class="kn">from</span> <span class="nn">.functions</span> <span class="kn">import</span> <span class="n">map_domain_gdf</span><span class="p">,</span> <span class="n">floodplain_gdf</span>
+
+<span class="c1"># Directories</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">CURRENT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CURRENT_DIR</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Wizard">
+<a class="viewcode-back" href="../../model.html#model.model.Wizard">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Wizard</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to store all magic numbers. For traceability and easy access.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">government_adaptation_strategies</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_initial_savings</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># U</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">house_vs_savings</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_std_savings_per_step_vs_house</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]</span> <span class="c1"># U</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_std_trustworthiness</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_std_trustworthiness_governnment</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span> <span class="c1"># U  </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_max_damage_estimation_factor</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_max_rationality</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_max_initial_risk_aversion</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span> <span class="c1"># U</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_risk_aversion</span> <span class="o">=</span> <span class="mf">0.03</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_max_actual_depth_factor</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_std_flood_influence_risk_aversion</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_adaptation_cost</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_information_abundance</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">information_cost</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps_with_flood</span> <span class="o">=</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">55</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">government_adaptation_strategies</span> <span class="o">=</span> <span class="n">government_adaptation_strategies</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;subsidy&quot;</span><span class="p">,</span> <span class="s2">&quot;information&quot;</span><span class="p">,</span> <span class="s2">&quot;dikes&quot;</span><span class="p">]</span></div>
+
+
+
+
+
+<span class="c1"># Define the AdaptationModel class</span>
+<div class="viewcode-block" id="AdaptationModel">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel">[docs]</a>
+<span class="k">class</span> <span class="nc">AdaptationModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main model running the simulation. It sets up the network of household agents,</span>
+<span class="sd">    simulates their behavior, and collects data. The network type can be adjusted based on study requirements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">number_of_households</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>  <span class="c1"># number of household agents</span>
+        <span class="c1"># Simplified argument for choosing flood map. Can currently be &quot;harvey&quot;, &quot;100yr&quot;, or &quot;500yr&quot;.</span>
+        <span class="n">flood_map_choice</span><span class="o">=</span><span class="s2">&quot;100yr&quot;</span><span class="p">,</span>
+        <span class="c1"># Can currently be &quot;erdos_renyi&quot;, &quot;barabasi_albert&quot;, &quot;watts_strogatz&quot;, or &quot;no_network&quot;</span>
+        <span class="n">network</span><span class="o">=</span><span class="s2">&quot;watts_strogatz&quot;</span><span class="p">,</span>
+        <span class="c1"># likeliness of edge being created between two nodes</span>
+        <span class="n">probability_of_network_connection</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+        <span class="c1"># number of edges for BA network</span>
+        <span class="n">number_of_edges</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="c1"># number of nearest neighbours for WS social network</span>
+        <span class="n">number_of_nearest_neighbours</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">years_per_step</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+        <span class="n">wizard</span><span class="o">=</span><span class="n">Wizard</span><span class="p">(),</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># Our stuff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span> <span class="o">=</span> <span class="n">wizard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span><span class="o">.</span><span class="n">initial_adaptation_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">information_abundance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span><span class="o">.</span><span class="n">initial_information_abundance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps_with_flood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span><span class="o">.</span><span class="n">steps_with_flood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">government_adaptation_strategies</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span><span class="o">.</span><span class="n">government_adaptation_strategies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">information_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wizard</span><span class="o">.</span><span class="n">information_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">years_per_step</span> <span class="o">=</span> <span class="n">years_per_step</span>
+
+        <span class="c1"># subsidy policy:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subsidy_policy</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">household</span><span class="p">:</span> <span class="mi">0</span>
+
+        <span class="c1"># defining the variables and setting the values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span> <span class="o">=</span> <span class="n">number_of_households</span>  <span class="c1"># Total number of household agents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="c1"># network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span>  <span class="c1"># Type of network to be created</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">probability_of_network_connection</span> <span class="o">=</span> <span class="n">probability_of_network_connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_edges</span> <span class="o">=</span> <span class="n">number_of_edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_nearest_neighbours</span> <span class="o">=</span> <span class="n">number_of_nearest_neighbours</span>
+
+        <span class="c1"># generating the graph according to the network used and the network parameters specified</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialize_network</span><span class="p">()</span>
+        <span class="c1"># create grid out of network graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">NetworkGrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="c1"># Initialize maps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_maps</span><span class="p">(</span><span class="n">flood_map_choice</span><span class="p">)</span>
+
+        <span class="c1"># set schedule for agents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="n">RandomActivation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Schedule for activating agents</span>
+
+        <span class="c1"># create households through initiating a household on each node of the network graph</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()):</span>
+            <span class="n">household</span> <span class="o">=</span> <span class="n">Households</span><span class="p">(</span><span class="n">unique_id</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">household</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">place_agent</span><span class="p">(</span><span class="n">agent</span><span class="o">=</span><span class="n">household</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">households</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span>
+
+        <span class="c1"># Add government</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Government</span><span class="p">(</span><span class="n">unique_id</span><span class="o">=</span><span class="n">number_of_households</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">households</span><span class="o">=</span><span class="n">households</span><span class="p">))</span>
+
+        <span class="c1"># You might want to create other agents here, e.g. insurance agents.</span>
+
+        <span class="c1"># Data collection setup to collect data</span>
+        <span class="n">model_metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TotalAdapted&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_adapted_households</span><span class="p">,</span>
+            <span class="s2">&quot;AverageRiskAversion&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">average_risk_aversion</span><span class="p">,</span>
+            <span class="s2">&quot;AverageEstimationFactor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">average_estimation_factor</span><span class="p">,</span>
+            <span class="s2">&quot;AdaptationCost&quot;</span><span class="p">:</span> <span class="s2">&quot;adaptation_cost&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;InformationAbundance&quot;</span><span class="p">:</span> <span class="s2">&quot;information_abundance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SocietalRisk&quot;</span><span class="p">:</span> <span class="s2">&quot;societal_risk&quot;</span><span class="p">,</span>
+            <span class="c1"># ... other reporters ...</span>
+        <span class="p">}</span>
+
+        <span class="n">agent_metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;FloodDepthTheoretical&quot;</span><span class="p">:</span> <span class="s2">&quot;flood_depth_theoretical&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FloodDamageEstimated&quot;</span><span class="p">:</span> <span class="s2">&quot;flood_damage_estimated&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FloodDepthActual&quot;</span><span class="p">:</span> <span class="s2">&quot;flood_depth_actual&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FloodDamageActual&quot;</span><span class="p">:</span> <span class="s2">&quot;flood_damage_actual&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FloodDamageEstimationFactor&quot;</span><span class="p">:</span> <span class="s2">&quot;flood_damage_estimation_factor&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;IsAdapted&quot;</span><span class="p">:</span> <span class="s2">&quot;is_adapted&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;RiskAversion&quot;</span><span class="p">:</span> <span class="s2">&quot;risk_aversion&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Savings&quot;</span><span class="p">:</span> <span class="s2">&quot;savings&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TotalBudget&quot;</span> <span class="p">:</span> <span class="s2">&quot;total_budget&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SubsidyBudget&quot;</span><span class="p">:</span> <span class="s2">&quot;subsidy_budget&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;DamageBudget&quot;</span><span class="p">:</span> <span class="s2">&quot;damage_budget&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;InformationBudget&quot;</span><span class="p">:</span> <span class="s2">&quot;information_budget&quot;</span><span class="p">,</span>
+            <span class="c1"># &quot;FriendsCount&quot;: lambda a: a.count_friends(radius=1),</span>
+            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;location&quot;</span><span class="p">,</span>
+            <span class="c1"># ... other reporters ...</span>
+        <span class="p">}</span>
+        <span class="c1"># set up the data collector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datacollector</span> <span class="o">=</span> <span class="n">DataCollector</span><span class="p">(</span><span class="n">model_reporters</span><span class="o">=</span><span class="n">model_metrics</span><span class="p">,</span> <span class="n">agent_reporters</span><span class="o">=</span><span class="n">agent_metrics</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AdaptationModel.initialize_network">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.initialize_network">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize and return the social network graph based on the provided network type using pattern matching.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">==</span> <span class="s2">&quot;erdos_renyi&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">erdos_renyi_graph</span><span class="p">(</span>
+                <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span><span class="p">,</span>
+                <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_nearest_neighbours</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">==</span> <span class="s2">&quot;barabasi_albert&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">barabasi_albert_graph</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">==</span> <span class="s2">&quot;watts_strogatz&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">watts_strogatz_graph</span><span class="p">(</span>
+                <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span><span class="p">,</span>
+                <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_nearest_neighbours</span><span class="p">,</span>
+                <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">probability_of_network_connection</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">==</span> <span class="s2">&quot;no_network&quot;</span><span class="p">:</span>
+            <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">G</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown network type: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Currently implemented network types are: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;erdos_renyi&#39;, &#39;barabasi_albert&#39;, &#39;watts_strogatz&#39;, and &#39;no_network&#39;&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.initialize_maps">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.initialize_maps">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialize_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flood_map_choice</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize and set up the flood map related data based on the provided flood map choice.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define paths to flood maps</span>
+        <span class="n">flood_map_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;harvey&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;input_data/floodmaps/Harvey_depth_meters.tif&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;100yr&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;input_data/floodmaps/100yr_storm_depth_meters.tif&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;500yr&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">BASE_DIR</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;input_data/floodmaps/500yr_storm_depth_meters.tif&quot;</span>
+            <span class="p">),</span>  <span class="c1"># Example path for 500yr flood map</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Throw a ValueError if the flood map choice is not in the dictionary</span>
+        <span class="k">if</span> <span class="n">flood_map_choice</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flood_map_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown flood map choice: &#39;</span><span class="si">{</span><span class="n">flood_map_choice</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Currently implemented choices are: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">flood_map_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Choose the appropriate flood map based on the input choice</span>
+        <span class="n">flood_map_path</span> <span class="o">=</span> <span class="n">flood_map_paths</span><span class="p">[</span><span class="n">flood_map_choice</span><span class="p">]</span>
+
+        <span class="c1"># Loading and setting up the flood map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flood_map</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">flood_map_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_flood_img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound_left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound_right</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound_top</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound_bottom</span> <span class="o">=</span> <span class="n">get_flood_map_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flood_map</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">floods_per_year</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;harvey&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;100yr&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;500yr&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">500</span><span class="p">}[</span><span class="n">flood_map_choice</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.get_households">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.get_households">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_households</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">agent</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Households</span><span class="p">)]</span></div>
+
+    
+<div class="viewcode-block" id="AdaptationModel.get_government">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.get_government">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_government</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Government</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">agent</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.total_adapted_households">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.total_adapted_households">[docs]</a>
+    <span class="k">def</span> <span class="nf">total_adapted_households</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the total number of households that have adapted.&quot;&quot;&quot;</span>
+        <span class="c1"># BE CAREFUL THAT YOU MAY HAVE DIFFERENT AGENT TYPES SO YOU NEED TO FIRST CHECK IF THE AGENT IS ACTUALLY A HOUSEHOLD AGENT USING &quot;ISINSTANCE&quot;</span>
+        <span class="n">adapted_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_households</span><span class="p">()</span> <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">is_adapted</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">adapted_count</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.average_risk_aversion">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.average_risk_aversion">[docs]</a>
+    <span class="k">def</span> <span class="nf">average_risk_aversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the average risk aversion of all households.&quot;&quot;&quot;</span>
+        <span class="n">risk_aversion</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">agent</span><span class="o">.</span><span class="n">risk_aversion</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Households</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">risk_aversion</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.average_estimation_factor">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.average_estimation_factor">[docs]</a>
+    <span class="k">def</span> <span class="nf">average_estimation_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the average estimation factor of all households.&quot;&quot;&quot;</span>
+        <span class="n">estimation_factor</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">agent</span><span class="o">.</span><span class="n">flood_damage_estimation_factor</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Households</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">estimation_factor</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_households</span></div>
+
+
+<div class="viewcode-block" id="AdaptationModel.plot_model_domain_with_agents">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.plot_model_domain_with_agents">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_model_domain_with_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="c1"># Plot the model domain</span>
+        <span class="n">map_domain_gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">)</span>
+        <span class="c1"># Plot the floodplain</span>
+        <span class="n">floodplain_gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightblue&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c1"># Collect agent locations and statuses</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Government</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span> <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">is_adapted</span> <span class="k">else</span> <span class="s2">&quot;red&quot;</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">color</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ax</span><span class="o">.</span><span class="n">collections</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">unique_id</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">agent</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+                <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">,</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># Create legend with unique entries</span>
+        <span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+        <span class="n">by_label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">handles</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">by_label</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">by_label</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Red: not adapted, Blue: adapted&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Customize plot with titles and labels</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model Domain with Agents at Step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Longitude&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Latitude&quot;</span><span class="p">)</span></div>
+
+        <span class="c1"># plt.show()</span>
+
+<div class="viewcode-block" id="AdaptationModel.step">
+<a class="viewcode-back" href="../../model.html#model.model.AdaptationModel.step">[docs]</a>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        introducing a shock:</span>
+<span class="sd">        at time step 5, there will be a global flooding.</span>
+<span class="sd">        This will result in actual flood depth. Here, we assume it is a random number</span>
+<span class="sd">        between 0.5 and 1.2 of the estimated flood depth. In your model, you can replace this</span>
+<span class="sd">        with a more sound procedure (e.g., you can devide the floop map into zones and</span>
+<span class="sd">        assume local flooding instead of global flooding). The actual flood depth can be</span>
+<span class="sd">        estimated differently</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">steps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps_with_flood</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">flood_occurs</span><span class="p">()</span>
+
+        <span class="c1"># Collect data and advance the model by one step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datacollector</span><span class="o">.</span><span class="n">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">step</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, SVH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
