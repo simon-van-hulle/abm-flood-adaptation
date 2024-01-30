@@ -30,7 +30,7 @@ class Wizard:
     """
     Class to store all magic numbers. For traceability and easy access.
     """
-    def __init__(self, government_adaptation_strategies=None):
+    def __init__(self, government_adaptation_strategies:list[str]=None)->None:
         self.max_initial_savings = 100 # U
         self.house_vs_savings = 10
         self.avg_std_savings_per_step_vs_house = [0.01, 0.01] # U
