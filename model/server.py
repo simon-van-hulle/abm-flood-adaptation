@@ -57,16 +57,6 @@ chart = mesa.visualization.ChartModule(
 )
 
 
-# def get_resistant_susceptible_ratio(model):
-#     ratio = model.resistant_susceptible_ratio()
-#     ratio_text = "&infin;" if ratio is math.inf else f"{ratio:.2f}"
-#     infected_text = str(number_infected(model))
-
-#     return "Resistant/Susceptible Ratio: {}<br>Infected Remaining: {}".format(
-#         ratio_text, infected_text
-#     )
-
-
 model_params = {
     "number_of_households": mesa.visualization.Slider(
         "Number of Households",
