@@ -502,8 +502,43 @@ The input data contains which percentage of households has a certain initial val
 <dt class="sig sig-object py" id="model.model.AdaptationModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.model.</span></span><span class="sig-name descname"><span class="pre">AdaptationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
-<p>The main model running the simulation. It sets up the network of household agents,
+<p>The main model running the simulation. Extention of the <code class="xref py py-class docutils literal notranslate"><span class="pre">mesa.Model</span></code> class. It sets up the network of household agents,
 simulates their behavior, and collects data. The network type can be adjusted based on study requirements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>int</em>) – seed for the random number generator</p></li>
+<li><p><strong>wizard</strong> (<a class="reference internal" href="#model.model.Wizard" title="model.model.Wizard"><em>Wizard</em></a>) – wizard object containing all magic numbers</p></li>
+<li><p><strong>adaptation_cost</strong> (<em>float</em>) – cost of full adaptation to a flood</p></li>
+<li><p><strong>information_abundance</strong> (<em>float</em>) – abundance of information available to the agents (between 0 and 1)</p></li>
+<li><p><strong>steps_with_flood</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – list of steps at which a flood occurs</p></li>
+<li><p><strong>government_adaptation_strategies</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – list of adaptation strategies the government can use</p></li>
+<li><p><strong>information_cost</strong> (<em>float</em>) – cost of information - full information abundance per step</p></li>
+<li><p><strong>years_per_step</strong> (<em>float</em>) – number of years per step</p></li>
+<li><p><strong>subsidy_policy</strong> (<em>callable</em>) – function that returns the subsidy for a given household</p></li>
+<li><p><strong>max_initial_savings</strong> (<em>int</em>) – maximum initial savings</p></li>
+<li><p><strong>house_vs_savings</strong> (<em>int</em>) – ratio of houses to savings</p></li>
+<li><p><strong>avg_std_savings_per_step_vs_house</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – average and standard deviation of savings per step per house</p></li>
+<li><p><strong>avg_std_trustworthiness</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – average and standard deviation of trustworthiness</p></li>
+<li><p><strong>avg_std_trustworthiness_governnment</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – average and standard deviation of government trustworthiness</p></li>
+<li><p><strong>min_max_damage_estimation_factor</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – minimum and maximum damage estimation factor</p></li>
+<li><p><strong>min_max_rationality</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – minimum and maximum rationality</p></li>
+<li><p><strong>min_max_initial_risk_aversion</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – minimum and maximum initial risk aversion</p></li>
+<li><p><strong>min_risk_aversion</strong> (<em>float</em>) – minimum risk aversion</p></li>
+<li><p><strong>min_max_actual_depth_factor</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – minimum and maximum actual depth factor</p></li>
+<li><p><strong>avg_std_flood_influence_risk_aversion</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – average and standard deviation of flood influence on risk aversion</p></li>
+<li><p><strong>number_of_households</strong> (<em>int</em>) – number of household agents</p></li>
+<li><p><strong>flood_map_choice</strong> (<em>str</em>) – flood map choice. Can currently be “harvey”, “100yr”, or “500yr”.</p></li>
+<li><p><strong>network</strong> (<em>str</em>) – network type. Can currently be “erdos_renyi”, “barabasi_albert”, “watts_strogatz”, or “no_network”</p></li>
+<li><p><strong>probability_of_network_connection</strong> (<em>float</em>) – likeliness of edge being created between two nodes</p></li>
+<li><p><strong>number_of_edges</strong> (<em>int</em>) – number of edges for BA network</p></li>
+<li><p><strong>number_of_nearest_neighbours</strong> (<em>int</em>) – number of nearest neighbours for WS social network</p></li>
+<li><p><strong>grid</strong> (<em>Network</em>) – grid object for the network representation</p></li>
+<li><p><strong>G</strong> (<em>nx.Graph</em>) – graph object for the network representation</p></li>
+<li><p><strong>schedule</strong> (<em>RandomActivation</em>) – schedule for activating agents</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="model.model.AdaptationModel.average_estimation_factor">
 <span class="sig-name descname"><span class="pre">average_estimation_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.average_estimation_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.average_estimation_factor" title="Link to this definition"></a></dt>
@@ -518,24 +553,52 @@ simulates their behavior, and collects data. The network type can be adjusted ba
 
 <dl class="py method">
 <dt class="sig sig-object py" id="model.model.AdaptationModel.get_government">
-<span class="sig-name descname"><span class="pre">get_government</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_government"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_government" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_government</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#model.agents.Government" title="model.agents.Government"><span class="pre">Government</span></a></span></span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_government"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_government" title="Link to this definition"></a></dt>
+<dd><p>Get the government agent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return Government<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the government agent</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="model.model.AdaptationModel.get_households">
-<span class="sig-name descname"><span class="pre">get_households</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_households"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_households" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_households</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#model.agents.Households" title="model.agents.Households"><span class="pre">Households</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_households"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_households" title="Link to this definition"></a></dt>
+<dd><p>Get all agents of type Household</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return list[Households]<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all agents in the model of type Household</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="model.model.AdaptationModel.initialize_maps">
-<span class="sig-name descname"><span class="pre">initialize_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map_choice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_maps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_maps" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">initialize_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map_choice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_maps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_maps" title="Link to this definition"></a></dt>
 <dd><p>Initialize and set up the flood map related data based on the provided flood map choice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flood_map_choice</strong> (<em>str</em>) – Chosen flood map (can be “harvey”, “100yr”, or “500yr”)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – In case flood map is not implemented</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="model.model.AdaptationModel.initialize_network">
-<span class="sig-name descname"><span class="pre">initialize_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_network" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">initialize_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_network" title="Link to this definition"></a></dt>
 <dd><p>Initialize and return the social network graph based on the provided network type using pattern matching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If provided network type is not implemented</p>
+</dd>
+<dt class="field-even">Return nx.Graph<span class="colon">:</span></dt>
+<dd class="field-even"><p>Graph object for the network representation</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -565,7 +628,7 @@ estimated differently</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="model.model.Wizard">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.model.</span></span><span class="sig-name descname"><span class="pre">Wizard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">government_adaptation_strategies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#Wizard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.Wizard" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.model.</span></span><span class="sig-name descname"><span class="pre">Wizard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">government_adaptation_strategies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#Wizard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.Wizard" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to store all magic numbers. For traceability and easy access.</p>
 </dd></dl>
