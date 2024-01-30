@@ -8,10 +8,11 @@ import geopandas as gpd
 import rasterio as rs
 import matplotlib.pyplot as plt
 import random
+from dataclasses import dataclass
 import os
 
 # Import the agent class(es) from agents.py
-from .agents import Households
+from .agents import Households, Government
 
 # Import functions from functions.py
 from .functions import get_flood_map_data, calculate_basic_flood_damage
@@ -23,8 +24,32 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.join(CURRENT_DIR, os.pardir)
 
-# class RiskModel:
-#     def AWR()
+
+@dataclass
+class Wizard:
+    """
+    Class to store all magic numbers. For traceability and easy access.
+    """
+    def __init__(self, government_adaptation_strategies=None):
+        self.max_initial_savings = 100 # U
+        self.house_vs_savings = 10
+        self.avg_std_savings_per_step_vs_house = [0.01, 0.01] # U
+        self.avg_std_trustworthiness = [0.1, 0.2]
+        self.avg_std_trustworthiness_governnment = [0.2, 0.1] # U  
+        self.min_max_damage_estimation_factor = [0, 1]
+        self.min_max_rationality = [0.4, 1.0]
+        self.min_max_initial_risk_aversion = [0.0, 1.0] # U
+        self.min_risk_aversion = 0.03
+        self.min_max_actual_depth_factor = [0.5, 1.2]
+        self.avg_std_flood_influence_risk_aversion = [0.5, 0.1]
+        self.initial_adaptation_cost = 100 #
+        self.initial_information_abundance = 0.1
+        self.information_cost = 100 #
+        self.steps_with_flood = [15, 55]
+        self.government_adaptation_strategies = government_adaptation_strategies or ["subsidy", "information", "dikes"]
+
+
+
 
 # Define the AdaptationModel class
 class AdaptationModel(Model):
@@ -38,9 +63,7 @@ class AdaptationModel(Model):
         seed=None,
         number_of_households=25,  # number of household agents
         # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
-        flood_map_choice="harvey",
-        # ### network related parameters ###
-        # The social network structure that is used.
+        flood_map_choice="100yr",
         # Can currently be "erdos_renyi", "barabasi_albert", "watts_strogatz", or "no_network"
         network="watts_strogatz",
         # likeliness of edge being created between two nodes
@@ -49,18 +72,20 @@ class AdaptationModel(Model):
         number_of_edges=3,
         # number of nearest neighbours for WS social network
         number_of_nearest_neighbours=5,
-        # adaptation cost
-        adaptation_cost=50,
-        information_abundance=0.5,
-        societal_risk=None, # FIXME
+        years_per_step=0.25,
+        wizard=Wizard(),
     ):
         super().__init__(seed=seed)
 
         # Our stuff
-        self.adaptation_cost = adaptation_cost
-        self.information_abundance =information_abundance 
-        self.societal_risk = societal_risk
-        
+        self.wizard = wizard
+        self.adaptation_cost = self.wizard.initial_adaptation_cost
+        self.information_abundance = self.wizard.initial_information_abundance
+        self.steps_with_flood = self.wizard.steps_with_flood
+        self.government_adaptation_strategies= self.wizard.government_adaptation_strategies
+        self.information_cost = self.wizard.information_cost
+        self.years_per_step = years_per_step
+
         # subsidy policy:
         self.subsidy_policy = lambda household: 0
 
@@ -90,22 +115,38 @@ class AdaptationModel(Model):
             household = Households(unique_id=i, model=self)
             self.schedule.add(household)
             self.grid.place_agent(agent=household, node_id=node)
+        households = self.schedule.agents
+
+        # Add government
+        self.schedule.add(Government(unique_id=number_of_households+1, model=self, households=households))
 
         # You might want to create other agents here, e.g. insurance agents.
 
         # Data collection setup to collect data
         model_metrics = {
-            "total_adapted_households": self.total_adapted_households,
+            "TotalAdapted": self.total_adapted_households,
+            "AverageRiskAversion": self.average_risk_aversion,
+            "AverageEstimationFactor": self.average_estimation_factor,
+            "AdaptationCost": "adaptation_cost",
+            "InformationAbundance": "information_abundance",
+            "SocietalRisk": "societal_risk",
             # ... other reporters ...
         }
 
         agent_metrics = {
-            "FloodDepthEstimated": "flood_depth_estimated",
+            "FloodDepthTheoretical": "flood_depth_theoretical",
             "FloodDamageEstimated": "flood_damage_estimated",
             "FloodDepthActual": "flood_depth_actual",
             "FloodDamageActual": "flood_damage_actual",
+            "FloodDamageEstimationFactor": "flood_damage_estimation_factor",
             "IsAdapted": "is_adapted",
-            "FriendsCount": lambda a: a.count_friends(radius=1),
+            "RiskAversion": "risk_aversion",
+            "Savings": "savings",
+            "TotalBudget" : "total_budget",
+            "SubsidyBudget": "subsidy_budget",
+            "DamageBudget": "damage_budget",
+            "InformationBudget": "information_budget",
+            # "FriendsCount": lambda a: a.count_friends(radius=1),
             "location": "location",
             # ... other reporters ...
         }
@@ -170,12 +211,32 @@ class AdaptationModel(Model):
         self.band_flood_img, self.bound_left, self.bound_right, self.bound_top, self.bound_bottom = get_flood_map_data(
             self.flood_map
         )
+        
+        self.floods_per_year = {"harvey": 1/50, "100yr": 1 / 100, "500yr": 1 / 500}[flood_map_choice]
+
+    def get_households(self):
+        return [agent for agent in self.schedule.agents if isinstance(agent, Households)]
+    
+    def get_government(self):
+        for agent in self.schedule.agents:
+            if isinstance(agent, Government):
+                return agent
 
     def total_adapted_households(self):
         """Return the total number of households that have adapted."""
         # BE CAREFUL THAT YOU MAY HAVE DIFFERENT AGENT TYPES SO YOU NEED TO FIRST CHECK IF THE AGENT IS ACTUALLY A HOUSEHOLD AGENT USING "ISINSTANCE"
-        adapted_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_adapted])
+        adapted_count = sum([1 for agent in self.get_households() if agent.is_adapted])
         return adapted_count
+
+    def average_risk_aversion(self):
+        """Return the average risk aversion of all households."""
+        risk_aversion = sum([agent.risk_aversion for agent in self.schedule.agents if isinstance(agent, Households)])
+        return risk_aversion / self.number_of_households
+
+    def average_estimation_factor(self):
+        """Return the average estimation factor of all households."""
+        estimation_factor = sum([agent.flood_damage_estimation_factor for agent in self.schedule.agents if isinstance(agent, Households)])
+        return estimation_factor / self.number_of_households
 
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
@@ -186,6 +247,8 @@ class AdaptationModel(Model):
 
         # Collect agent locations and statuses
         for agent in self.schedule.agents:
+            if isinstance(agent, Government):
+                continue
             color = "blue" if agent.is_adapted else "red"
             ax.scatter(
                 agent.location.x,
@@ -223,13 +286,10 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be
         estimated differently
         """
-    
-        if self.schedule.steps == 5:
+
+        if self.schedule.steps in self.steps_with_flood:
             for agent in self.schedule.agents:
-                # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
-                # calculate the actual flood damage given the actual flood depth
-                agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
+                agent.flood_occurs()
 
         # Collect data and advance the model by one step
         self.datacollector.collect(self)

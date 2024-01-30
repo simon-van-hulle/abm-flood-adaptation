@@ -39,6 +39,7 @@ def savefig(filename, *dirs, **kwargs):
         thedir = os.path.join(thedir, dir)
         if not os.path.exists(thedir):
             os.makedirs(thedir)
+    plt.tight_layout()
     plt.savefig(os.path.join(thedir, filename), **kwargs)
     LOG(f"Saved figure to {thedir}/{filename}")
 
@@ -54,7 +55,7 @@ def plot_network(ax, model):
     # Clear the current axes.
     ax.clear()
     # Determine the color of each node (agent) based on their adaptation status.
-    colors = ["blue" if agent.is_adapted else "red" for agent in model.schedule.agents]
+    colors = ["blue" if agent.is_adapted else "red" for agent in model.get_households()]
     # Draw the network with node colors and labels.
     nx.draw(model.G, pos, node_color=colors, with_labels=True, ax=ax)
     # Set the title of the plot with the current step number.
