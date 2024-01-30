@@ -30,37 +30,44 @@ class Wizard:
     """
     Class to store all magic numbers. For traceability and easy access.
     """
-    def __init__(self, government_adaptation_strategies:list[str]=None)->None:
-        self.max_initial_savings = 100 # U
+
+    def __init__(self, government_adaptation_strategies: list[str] = None) -> None:
+        self.max_initial_savings = 100  # U
         self.house_vs_savings = 10
-        self.avg_std_savings_per_step_vs_house = [0.01, 0.01] # U
+        self.avg_std_savings_per_step_vs_house = [0.01, 0.01]  # U
         self.avg_std_trustworthiness = [0.1, 0.2]
-        self.avg_std_trustworthiness_governnment = [0.2, 0.1] # U  
+        self.avg_std_trustworthiness_governnment = [0.2, 0.1]  # U
         self.min_max_damage_estimation_factor = [0, 1]
         self.min_max_rationality = [0.4, 1.0]
-        self.min_max_initial_risk_aversion = [0.0, 1.0] # U
+        self.min_max_initial_risk_aversion = [0.0, 1.0]  # U
         self.min_risk_aversion = 0.03
         self.min_max_actual_depth_factor = [0.5, 1.2]
         self.avg_std_flood_influence_risk_aversion = [0.5, 0.1]
-        self.initial_adaptation_cost = 100 #
+        self.initial_adaptation_cost = 100  #
         self.initial_information_abundance = 0.1
-        self.information_cost = 100 #
+        self.information_cost = 100  #
         self.steps_with_flood = [15, 55]
         self.government_adaptation_strategies = government_adaptation_strategies or ["subsidy", "information", "dikes"]
-
-
 
 
 # Define the AdaptationModel class
 class AdaptationModel(Model):
     """
-    The main model running the simulation. It sets up the network of household agents,
+    The main model running the simulation. Extention of the :class:`mesa.Model` class. It sets up the network of household agents,
     simulates their behavior, and collects data. The network type can be adjusted based on study requirements.
+    
+    :param int seed: seed for the random number generator
+    :param Wizard wizard: wizard object containing all magic numbers
+    :param float adaptation_cost: cost of full adaptation to a flood
+    :param float information_abundance: abundance of information available to the agents (between 0 and 1)
+    :param list[int] steps_with_flood: list of steps at which a flood occurs
+    :param list[str] government_adaptation_strategies: list of adaptation strategies the government can use
+    :param float information_cost: cost of information - full information abundance per step
     """
 
     def __init__(
         self,
-        seed=None,
+        seed: int = None,
         number_of_households=25,  # number of household agents
         # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
         flood_map_choice="100yr",
@@ -82,7 +89,7 @@ class AdaptationModel(Model):
         self.adaptation_cost = self.wizard.initial_adaptation_cost
         self.information_abundance = self.wizard.initial_information_abundance
         self.steps_with_flood = self.wizard.steps_with_flood
-        self.government_adaptation_strategies= self.wizard.government_adaptation_strategies
+        self.government_adaptation_strategies = self.wizard.government_adaptation_strategies
         self.information_cost = self.wizard.information_cost
         self.years_per_step = years_per_step
 
@@ -118,7 +125,7 @@ class AdaptationModel(Model):
         households = self.schedule.agents
 
         # Add government
-        self.schedule.add(Government(unique_id=number_of_households+1, model=self, households=households))
+        self.schedule.add(Government(unique_id=number_of_households + 1, model=self, households=households))
 
         # You might want to create other agents here, e.g. insurance agents.
 
@@ -142,7 +149,7 @@ class AdaptationModel(Model):
             "IsAdapted": "is_adapted",
             "RiskAversion": "risk_aversion",
             "Savings": "savings",
-            "TotalBudget" : "total_budget",
+            "TotalBudget": "total_budget",
             "SubsidyBudget": "subsidy_budget",
             "DamageBudget": "damage_budget",
             "InformationBudget": "information_budget",
@@ -211,12 +218,12 @@ class AdaptationModel(Model):
         self.band_flood_img, self.bound_left, self.bound_right, self.bound_top, self.bound_bottom = get_flood_map_data(
             self.flood_map
         )
-        
-        self.floods_per_year = {"harvey": 1/50, "100yr": 1 / 100, "500yr": 1 / 500}[flood_map_choice]
+
+        self.floods_per_year = {"harvey": 1 / 50, "100yr": 1 / 100, "500yr": 1 / 500}[flood_map_choice]
 
     def get_households(self):
         return [agent for agent in self.schedule.agents if isinstance(agent, Households)]
-    
+
     def get_government(self):
         for agent in self.schedule.agents:
             if isinstance(agent, Government):
@@ -235,7 +242,9 @@ class AdaptationModel(Model):
 
     def average_estimation_factor(self):
         """Return the average estimation factor of all households."""
-        estimation_factor = sum([agent.flood_damage_estimation_factor for agent in self.schedule.agents if isinstance(agent, Households)])
+        estimation_factor = sum(
+            [agent.flood_damage_estimation_factor for agent in self.schedule.agents if isinstance(agent, Households)]
+        )
         return estimation_factor / self.number_of_households
 
     def plot_model_domain_with_agents(self):
