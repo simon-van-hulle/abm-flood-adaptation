@@ -431,16 +431,18 @@ row, col: location within the tif-file</p>
 <span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">set_initial_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#set_initial_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.set_initial_values" title="Link to this definition"></a></dt>
 <dd><p>Function to set the values based on the distribution shown in the input data for each parameter.
 The input data contains which percentage of households has a certain initial value.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
-<p>input_data: the dataframe containing the distribution of paramters
-parameter: parameter name that is to be set
-seed: agent’s seed</p>
-</section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<p>parameter_set: the value that is set for a certain agent for the specified parameter</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<em>DataFrame</em>) – the dataframe containing the distribution of paramters</p></li>
+<li><p><strong>parameter</strong> (<em>str</em>) – parameter name that is to be set</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – agent’s seed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return _type_<span class="colon">:</span></dt>
+<dd class="field-even"><p>the value that is set for a certain agent for the specified parameter</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
