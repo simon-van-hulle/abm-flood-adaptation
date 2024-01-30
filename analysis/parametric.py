@@ -6,6 +6,9 @@ import numpy as np
 import os
 from functools import partial
 
+
+from ema_workbench import IpyparallelEvaluator
+
 from ema_workbench import (
     ReplicatorModel,
     RealParameter,
@@ -21,9 +24,9 @@ from ema_workbench import (
 
 HOUSEHOLDS = 200
 N_STEPS = 80
-REPLICATIONS = 5
-SCENARIOS = 1000
-FILENAME = "long"
+REPLICATIONS = 100
+SCENARIOS = 20
+FILENAME = "explore"
 
 print(OUTPUT_DIR)
 

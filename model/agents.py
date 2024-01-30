@@ -23,6 +23,27 @@ class Households(Agent):
     An agent representing a household in the model.
     Each household has a flood depth attribute which is randomly assigned for demonstration purposes.
     In a real scenario, this would be based on actual geographical data or more complex logic.
+
+    :param int unique_id: unique identifier for the agent
+    :param AdaptationModel model: the model the agent belongs to
+    :param bool is_adapted: whether the agent has adapted to flooding
+    :param float savings: amount of money the agent has saved
+    :param float house_value: value of the house - this is a representation of the total capital of the household
+    :param float government_subsidy_money: amount of money the government has paid for adaptation
+    :param float government_damage_money: amount of money the government has paid for damage
+    :param Point location: location of the household on the map
+    :param bool in_floodplain: whether the household is in the floodplain
+    :param float flood_depth_actual: actual flood depth of the household
+    :param float flood_depth_theoretical: theoretical flood depth of the household
+    :param float flood_damage_theoretical: theoretical flood damage of the household
+    :param float flood_damage_estimated: estimated flood damage of the household
+    :param float flood_damage_actual: actual flood damage of the household
+    :param list friends: list of friends of the household
+    :param float risk_aversion: risk aversion of the household
+    :param float flood_damage_estimation_factor: factor used to estimate flood damage
+    :param float rationality: rationality of the household
+    :param list trustworthiness_of_friends: list of trustworthiness of friends of the household
+    :param float trustworthiness_of_government: trustworthiness of the government
     """
 
     def __init__(self, unique_id, model):
@@ -36,8 +57,7 @@ class Households(Agent):
         self.government_subsidy_money = 0
         self.government_damage_money = 0
 
-        # getting flood map values
-        # Get a random location on the map
+        # getting flood map values - Get a random location on the map
         loc_x, loc_y = generate_random_location_within_map_domain()
         self.location = Point(loc_x, loc_y)
 
@@ -47,8 +67,6 @@ class Households(Agent):
         # Get the estimated flood depth at those coordinates.
         # the estimated flood depth is calculated based on the flood map (i.e., past data) so this is not the actual flood depth
         # Flood depth can be negative if the location is at a high elevation --> Made zero
-
-        # TODO This might become dynamic if building is include
 
         # Add an attribute for the actual flood depth. This is set to zero at the beginning of the simulation since there is not flood yet
         # and will update its value when there is a shock (i.e., actual flood). Shock happens at some point during the simulation
@@ -65,6 +83,11 @@ class Households(Agent):
 
     @property
     def flood_depth_theoretical(self):
+        """
+        Get the theoretical flood depth according to the flood maps.
+
+        :return float: maximum of estimated flood depth and zero
+        """
         if self.is_adapted:
             return 0
 
@@ -76,13 +99,22 @@ class Households(Agent):
         )
 
     @property
-    def flood_damage_theoretical(self):
-        "Factor between 0 and 1"
+    def flood_damage_theoretical(self) -> float:
+        """
+        Theoretical value adjusted with factor between 0 and 1
+
+        :return float: basic flood damage
+        """
 
         return calculate_basic_flood_damage(flood_depth=self.flood_depth_theoretical)
 
     @property
-    def flood_damage_estimated(self):
+    def flood_damage_estimated(self) -> float:
+        """
+        _summary_
+
+        :return float: _description_
+        """
         return self.flood_damage_theoretical * self.flood_damage_estimation_factor
 
     @property
@@ -251,7 +283,7 @@ class RiskModel:
 
     def SRI(self, area: float, n: int = None, IR: float = None, T: float = 1) -> float:
         """
-        Scaled Risk Integral in (person + person^2) / (acre * step). 
+        Scaled Risk Integral in (person + person^2) / (acre * step).
         This is usally expressed per million year instead of step, so a conversion factor is required
 
         :param float area: total area of interest
@@ -299,7 +331,17 @@ class FloodRiskModel(RiskModel):
 # Define the Government agent class
 class Government(Agent):
     """
-    A government agent that currently doesn't perform any actions.
+    A government agent that is responsible for adaptation policies.
+    
+    :param int unique_id: unique identifier for the agent
+    :param AdaptationModel model: the model the agent belongs to
+    :param list households: list of households in the model
+    :param float total_budget: total budget of the government
+    :param float subsidy_budget: budget for subsidies
+    :param float damage_budget: budget for damage
+    :param float information_budget: budget for information
+    :param RiskModel risk_model: risk model for the government
+    :param float n_households: number of households in the model
     """
 
     # Ideas

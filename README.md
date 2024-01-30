@@ -3,7 +3,7 @@
 
 ## Documentation
 
-Visit the documentation at https://simon-van-hulle.github.io/abm-flood-adaptation/
+Visit the documentation at https://abm-flood-adaptation.readthedocs.io/en/latest/
 
 ## Introduction
 This directory contains a minimal agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events in a social network context. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
