@@ -63,28 +63,45 @@ class AdaptationModel(Model):
     :param list[int] steps_with_flood: list of steps at which a flood occurs
     :param list[str] government_adaptation_strategies: list of adaptation strategies the government can use
     :param float information_cost: cost of information - full information abundance per step
+    :param float years_per_step: number of years per step
+    :param callable subsidy_policy: function that returns the subsidy for a given household
+    :param int max_initial_savings: maximum initial savings
+    :param int house_vs_savings: ratio of houses to savings
+    :param list[float] avg_std_savings_per_step_vs_house: average and standard deviation of savings per step per house
+    :param list[float] avg_std_trustworthiness: average and standard deviation of trustworthiness
+    :param list[float] avg_std_trustworthiness_governnment: average and standard deviation of government trustworthiness
+    :param list[float] min_max_damage_estimation_factor: minimum and maximum damage estimation factor
+    :param list[float] min_max_rationality: minimum and maximum rationality
+    :param list[float] min_max_initial_risk_aversion: minimum and maximum initial risk aversion
+    :param float min_risk_aversion: minimum risk aversion
+    :param list[float] min_max_actual_depth_factor: minimum and maximum actual depth factor
+    :param list[float] avg_std_flood_influence_risk_aversion: average and standard deviation of flood influence on risk aversion
+    :param int number_of_households: number of household agents
+    :param str flood_map_choice: flood map choice. Can currently be "harvey", "100yr", or "500yr".
+    :param str network: network type. Can currently be "erdos_renyi", "barabasi_albert", "watts_strogatz", or "no_network"
+    :param float probability_of_network_connection: likeliness of edge being created between two nodes
+    :param int number_of_edges: number of edges for BA network
+    :param int number_of_nearest_neighbours: number of nearest neighbours for WS social network
+    :param Network grid: grid object for the network representation
+    :param nx.Graph G: graph object for the network representation
+    :param RandomActivation schedule: schedule for activating agents
     """
 
     def __init__(
         self,
         seed: int = None,
-        number_of_households=25,  # number of household agents
-        # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
+        number_of_households=25,
         flood_map_choice="100yr",
-        # Can currently be "erdos_renyi", "barabasi_albert", "watts_strogatz", or "no_network"
         network="watts_strogatz",
-        # likeliness of edge being created between two nodes
         probability_of_network_connection=0.4,
-        # number of edges for BA network
         number_of_edges=3,
-        # number of nearest neighbours for WS social network
         number_of_nearest_neighbours=5,
         years_per_step=0.25,
         wizard=Wizard(),
     ):
         super().__init__(seed=seed)
 
-        # Our stuff
+        # Additional parameters
         self.wizard = wizard
         self.adaptation_cost = self.wizard.initial_adaptation_cost
         self.information_abundance = self.wizard.initial_information_abundance
@@ -93,7 +110,7 @@ class AdaptationModel(Model):
         self.information_cost = self.wizard.information_cost
         self.years_per_step = years_per_step
 
-        # subsidy policy:
+        # Default subsidy policy:
         self.subsidy_policy = lambda household: 0
 
         # defining the variables and setting the values
@@ -108,7 +125,6 @@ class AdaptationModel(Model):
 
         # generating the graph according to the network used and the network parameters specified
         self.G = self.initialize_network()
-        # create grid out of network graph
         self.grid = NetworkGrid(self.G)
 
         # Initialize maps
@@ -160,7 +176,7 @@ class AdaptationModel(Model):
         # set up the data collector
         self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
 
-    def initialize_network(self):
+    def initialize_network(self) -> nx.Graph:
         """
         Initialize and return the social network graph based on the provided network type using pattern matching.
         """
