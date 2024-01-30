@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>model package &mdash; Flood Adaptation 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests package" href="tests.html" />
+    <link rel="prev" title="General API Documentation" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Flood Adaptation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Flood Adaptation and Societal Risk</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">General API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">model package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model.agents">model.agents module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.agents.FloodRiskModel"><code class="docutils literal notranslate"><span class="pre">FloodRiskModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.agents.Government"><code class="docutils literal notranslate"><span class="pre">Government</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.agents.Households"><code class="docutils literal notranslate"><span class="pre">Households</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.agents.RiskModel"><code class="docutils literal notranslate"><span class="pre">RiskModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model.functions">model.functions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.calculate_basic_flood_damage"><code class="docutils literal notranslate"><span class="pre">calculate_basic_flood_damage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.generate_random_location_within_map_domain"><code class="docutils literal notranslate"><span class="pre">generate_random_location_within_map_domain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.get_flood_depth"><code class="docutils literal notranslate"><span class="pre">get_flood_depth()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.get_flood_map_data"><code class="docutils literal notranslate"><span class="pre">get_flood_map_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.get_position_flood"><code class="docutils literal notranslate"><span class="pre">get_position_flood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.lognormal_cdf"><code class="docutils literal notranslate"><span class="pre">lognormal_cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.set_initial_values"><code class="docutils literal notranslate"><span class="pre">set_initial_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.sigminv"><code class="docutils literal notranslate"><span class="pre">sigminv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.functions.sigmoid"><code class="docutils literal notranslate"><span class="pre">sigmoid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model.model">model.model module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.model.AdaptationModel"><code class="docutils literal notranslate"><span class="pre">AdaptationModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.model.Wizard"><code class="docutils literal notranslate"><span class="pre">Wizard</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model.server">model.server module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.server.household_portrayal"><code class="docutils literal notranslate"><span class="pre">household_portrayal()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model.utils">model.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.LOG"><code class="docutils literal notranslate"><span class="pre">LOG()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.LOGVAR"><code class="docutils literal notranslate"><span class="pre">LOGVAR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.LV"><code class="docutils literal notranslate"><span class="pre">LV()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.NAME"><code class="docutils literal notranslate"><span class="pre">NAME()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.plot_network"><code class="docutils literal notranslate"><span class="pre">plot_network()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#model.utils.savefig"><code class="docutils literal notranslate"><span class="pre">savefig()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Flood Adaptation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">General API Documentation</a></li>
+      <li class="breadcrumb-item active">model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="model-package">
+<h1>model package<a class="headerlink" href="#model-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-model.agents">
+<span id="model-agents-module"></span><h2>model.agents module<a class="headerlink" href="#module-model.agents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.agents.FloodRiskModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.agents.</span></span><span class="sig-name descname"><span class="pre">FloodRiskModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model,</span> <span class="pre">agents,</span> <span class="pre">agent_type_filter=[&lt;class</span> <span class="pre">'model.agents.Households'&gt;],</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#FloodRiskModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.FloodRiskModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#model.agents.RiskModel" title="model.agents.RiskModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskModel</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.FloodRiskModel.p_death_if_failure">
+<span class="sig-name descname"><span class="pre">p_death_if_failure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#FloodRiskModel.p_death_if_failure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.FloodRiskModel.p_death_if_failure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.FloodRiskModel.p_failure">
+<span class="sig-name descname"><span class="pre">p_failure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#FloodRiskModel.p_failure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.FloodRiskModel.p_failure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.agents.Government">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.agents.</span></span><span class="sig-name descname"><span class="pre">Government</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></p>
+<p>A government agent that currently doesn’t perform any actions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.evaluate_risk">
+<span class="sig-name descname"><span class="pre">evaluate_risk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.evaluate_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.evaluate_risk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.flood_occurs">
+<span class="sig-name descname"><span class="pre">flood_occurs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.flood_occurs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.flood_occurs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.poll">
+<span class="sig-name descname"><span class="pre">poll</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.poll"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.poll" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.update_policy">
+<span class="sig-name descname"><span class="pre">update_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.update_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.update_policy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Government.update_spending">
+<span class="sig-name descname"><span class="pre">update_spending</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Government.update_spending"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Government.update_spending" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.agents.Households">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.agents.</span></span><span class="sig-name descname"><span class="pre">Households</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></p>
+<p>An agent representing a household in the model.
+Each household has a flood depth attribute which is randomly assigned for demonstration purposes.
+In a real scenario, this would be based on actual geographical data or more complex logic.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.count_friends">
+<span class="sig-name descname"><span class="pre">count_friends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.count_friends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.count_friends" title="Link to this definition"></a></dt>
+<dd><p>Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.do_adaptation">
+<span class="sig-name descname"><span class="pre">do_adaptation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.do_adaptation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.do_adaptation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="model.agents.Households.flood_damage_actual">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flood_damage_actual</span></span><a class="headerlink" href="#model.agents.Households.flood_damage_actual" title="Link to this definition"></a></dt>
+<dd><p>Factor between 0 and 1</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="model.agents.Households.flood_damage_estimated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flood_damage_estimated</span></span><a class="headerlink" href="#model.agents.Households.flood_damage_estimated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="model.agents.Households.flood_damage_theoretical">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flood_damage_theoretical</span></span><a class="headerlink" href="#model.agents.Households.flood_damage_theoretical" title="Link to this definition"></a></dt>
+<dd><p>Factor between 0 and 1</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="model.agents.Households.flood_depth_theoretical">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flood_depth_theoretical</span></span><a class="headerlink" href="#model.agents.Households.flood_depth_theoretical" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.flood_occurs">
+<span class="sig-name descname"><span class="pre">flood_occurs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.flood_occurs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.flood_occurs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="model.agents.Households.friends">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">friends</span></span><a class="headerlink" href="#model.agents.Households.friends" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.inform">
+<span class="sig-name descname"><span class="pre">inform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.inform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.inform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.interact">
+<span class="sig-name descname"><span class="pre">interact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.interact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.interact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.Households.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#Households.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.Households.step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.agents.RiskModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.agents.</span></span><span class="sig-name descname"><span class="pre">RiskModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_type_filter=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_aversion_factor=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cx_function=&lt;function</span> <span class="pre">RiskModel.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that calculates the risk of flooding for the entire model.
+* IR = Individual risk
+* SR = Societal risk
+* N = number of households
+* AWR = Average Weighted Risk
+* SRI = Scaled Risk Integral
+* RI = Collective Risk Integral</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.AWR">
+<span class="sig-name descname"><span class="pre">AWR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.AWR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.AWR" title="Link to this definition"></a></dt>
+<dd><p>The average weighted risk. Area aspects are included in the IR function</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.FN_curve">
+<span class="sig-name descname"><span class="pre">FN_curve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.FN_curve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.FN_curve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.F_N">
+<span class="sig-name descname"><span class="pre">F_N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.F_N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.F_N" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.IR">
+<span class="sig-name descname"><span class="pre">IR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.IR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.IR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.P_N">
+<span class="sig-name descname"><span class="pre">P_N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.P_N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.P_N" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.RI">
+<span class="sig-name descname"><span class="pre">RI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.RI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.RI" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.SRI">
+<span class="sig-name descname"><span class="pre">SRI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/agents.html#RiskModel.SRI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.SRI" title="Link to this definition"></a></dt>
+<dd><p>Scaled Risk Integral in (person + person^2) / (acre * step). 
+This is usally expressed per million year instead of step, so a conversion factor is required</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>area</strong> (<em>float</em>) – total area of interest</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – number of people occupying the area, defaults to None</p></li>
+<li><p><strong>IR</strong> (<em>float</em>) – average individual risk in the area during the time of interest, defaults to None</p></li>
+<li><p><strong>T</strong> (<em>float</em>) – fraction of time the area is occupied by n people, defaults to 1</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scaled Risk Integral in (person + person^2) / (acre * step)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.avg_IR">
+<span class="sig-name descname"><span class="pre">avg_IR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.avg_IR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.avg_IR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.f_N">
+<span class="sig-name descname"><span class="pre">f_N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.f_N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.f_N" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.p_death_if_failure">
+<span class="sig-name descname"><span class="pre">p_death_if_failure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.p_death_if_failure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.p_death_if_failure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.p_failure">
+<span class="sig-name descname"><span class="pre">p_failure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.p_failure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.p_failure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.agents.RiskModel.societal_risk_exceeds_threshold">
+<span class="sig-name descname"><span class="pre">societal_risk_exceeds_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/agents.html#RiskModel.societal_risk_exceeds_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.agents.RiskModel.societal_risk_exceeds_threshold" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-model.functions">
+<span id="model-functions-module"></span><h2>model.functions module<a class="headerlink" href="#module-model.functions" title="Link to this heading"></a></h2>
+<p>&#64;author: thoridwagenblast</p>
+<p>Functions that are used in the model_file.py and agent.py for the running of the Flood Adaptation Model.
+Functions get called by the Model and Agent class.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.calculate_basic_flood_damage">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">calculate_basic_flood_damage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#calculate_basic_flood_damage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.calculate_basic_flood_damage" title="Link to this definition"></a></dt>
+<dd><p>To get flood damage based on flood depth of household
+from de Moer, Huizinga (2017) with logarithmic regression over it.
+If flood depth &gt; 6m, damage = 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flood_depth</strong> (<em>float</em>) – flood depth as given by location within model domain</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated damage between 0 and 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.generate_random_location_within_map_domain">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">generate_random_location_within_map_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#generate_random_location_within_map_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.generate_random_location_within_map_domain" title="Link to this definition"></a></dt>
+<dd><p>Generate random location coordinates within the map domain polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return tuple[float, float]<span class="colon">:</span></dt>
+<dd class="field-odd"><p>lists of location coordinates, longitude and latitude</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.get_flood_depth">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corresponding_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#get_flood_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_depth" title="Link to this definition"></a></dt>
+<dd><p>To get the flood depth of a specific location within the model domain.
+Households are placed randomly on the map, so the distribution does not follow reality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>corresponding_map</strong> (<em>str</em>) – flood map used</p></li>
+<li><p><strong>location</strong> (<em>Point</em>) – household location (a Shapely Point) on the map</p></li>
+<li><p><strong>band</strong> (<em>np.ndarray</em>) – band from the flood map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flood Depth</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.get_flood_map_data">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#get_flood_map_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_map_data" title="Link to this definition"></a></dt>
+<dd><p>Get the characteristics of the flood map data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flood_map</strong> (<em>str</em>) – flood map in tif format</p>
+</dd>
+<dt class="field-even">Return tuple[float, float, float, float]<span class="colon">:</span></dt>
+<dd class="field-even"><p>characteristics of the tif-file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.get_position_flood">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_position_flood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bound_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#get_position_flood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_position_flood" title="Link to this definition"></a></dt>
+<dd><p>To generater the position on flood map for a household.
+Households are placed randomly on the map, so the distribution does not follow reality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bound_l</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_r</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_t</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_b</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>img</strong> (<em>str</em>) – characteristics of the flood map .tif file</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – seed to generate the location on the map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return tuple[float, float, int, int]<span class="colon">:</span></dt>
+<dd class="field-even"><p>location on the map and location within the tif-file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.lognormal_cdf">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">lognormal_cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#lognormal_cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.lognormal_cdf" title="Link to this definition"></a></dt>
+<dd><p>Cumulative density function of the lognormal distribution. Integral of the lognormal probability density function 
+from minus infinity to x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – Upper bound of the pdf integral</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – mean of the lognormal distribution</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – standard deviation of the lognormal distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>cumulative density function P(X &lt;= x)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.set_initial_values">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">set_initial_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#set_initial_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.set_initial_values" title="Link to this definition"></a></dt>
+<dd><p>Function to set the values based on the distribution shown in the input data for each parameter.
+The input data contains which percentage of households has a certain initial value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<em>DataFrame</em>) – the dataframe containing the distribution of paramters</p></li>
+<li><p><strong>parameter</strong> (<em>str</em>) – parameter name that is to be set</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – agent’s seed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return any<span class="colon">:</span></dt>
+<dd class="field-even"><p>the value that is set for a certain agent for the specified parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.sigminv">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigminv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#sigminv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigminv" title="Link to this definition"></a></dt>
+<dd><p>Inverse sigmoid function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – sigmoid function of the unknown variable</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution inverse sigmoid function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.functions.sigmoid">
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigmoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#sigmoid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigmoid" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the sigmoid function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – input variable</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>sigmoid(x)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-model.model">
+<span id="model-model-module"></span><h2>model.model module<a class="headerlink" href="#module-model.model" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.model.AdaptationModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.model.</span></span><span class="sig-name descname"><span class="pre">AdaptationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>The main model running the simulation. It sets up the network of household agents,
+simulates their behavior, and collects data. The network type can be adjusted based on study requirements.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.average_estimation_factor">
+<span class="sig-name descname"><span class="pre">average_estimation_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.average_estimation_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.average_estimation_factor" title="Link to this definition"></a></dt>
+<dd><p>Return the average estimation factor of all households.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.average_risk_aversion">
+<span class="sig-name descname"><span class="pre">average_risk_aversion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.average_risk_aversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.average_risk_aversion" title="Link to this definition"></a></dt>
+<dd><p>Return the average risk aversion of all households.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.get_government">
+<span class="sig-name descname"><span class="pre">get_government</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_government"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_government" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.get_households">
+<span class="sig-name descname"><span class="pre">get_households</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.get_households"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.get_households" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.initialize_maps">
+<span class="sig-name descname"><span class="pre">initialize_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map_choice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_maps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_maps" title="Link to this definition"></a></dt>
+<dd><p>Initialize and set up the flood map related data based on the provided flood map choice.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.initialize_network">
+<span class="sig-name descname"><span class="pre">initialize_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.initialize_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.initialize_network" title="Link to this definition"></a></dt>
+<dd><p>Initialize and return the social network graph based on the provided network type using pattern matching.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.plot_model_domain_with_agents">
+<span class="sig-name descname"><span class="pre">plot_model_domain_with_agents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.plot_model_domain_with_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.plot_model_domain_with_agents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.step" title="Link to this definition"></a></dt>
+<dd><p>introducing a shock:
+at time step 5, there will be a global flooding.
+This will result in actual flood depth. Here, we assume it is a random number
+between 0.5 and 1.2 of the estimated flood depth. In your model, you can replace this
+with a more sound procedure (e.g., you can devide the floop map into zones and
+assume local flooding instead of global flooding). The actual flood depth can be
+estimated differently</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.model.AdaptationModel.total_adapted_households">
+<span class="sig-name descname"><span class="pre">total_adapted_households</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#AdaptationModel.total_adapted_households"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.AdaptationModel.total_adapted_households" title="Link to this definition"></a></dt>
+<dd><p>Return the total number of households that have adapted.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="model.model.Wizard">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.model.</span></span><span class="sig-name descname"><span class="pre">Wizard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">government_adaptation_strategies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/model.html#Wizard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.model.Wizard" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to store all magic numbers. For traceability and easy access.</p>
+</dd></dl>
+
+</section>
+<section id="module-model.server">
+<span id="model-server-module"></span><h2>model.server module<a class="headerlink" href="#module-model.server" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.server.household_portrayal">
+<span class="sig-prename descclassname"><span class="pre">model.server.</span></span><span class="sig-name descname"><span class="pre">household_portrayal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/server.html#household_portrayal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.server.household_portrayal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-model.utils">
+<span id="model-utils-module"></span><h2>model.utils module<a class="headerlink" href="#module-model.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.LOG">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">LOG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">strings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/utils.html#LOG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.utils.LOG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.LOGVAR">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">LOGVAR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10.5f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/utils.html#LOGVAR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.utils.LOGVAR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.LV">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">LV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10.5f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.utils.LV" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.NAME">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">NAME</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/utils.html#NAME"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.utils.NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.plot_network">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">plot_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/utils.html#plot_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.utils.plot_network" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="model.utils.savefig">
+<span class="sig-prename descclassname"><span class="pre">model.utils.</span></span><span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dirs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/utils.html#savefig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.utils.savefig" title="Link to this definition"></a></dt>
+<dd><p>Save a figure with the given filename and directories</p>
+</dd></dl>
+
+</section>
+<section id="module-model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-model" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="General API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.html" class="btn btn-neutral float-right" title="tests package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, SVH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
