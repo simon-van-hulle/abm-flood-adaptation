@@ -229,27 +229,41 @@ class RiskModel:
     def p_death_if_failure(self, agent):
         raise NotImplementedError("The risk model requires a function for the probability of death if a failure occurs")
 
-    def avg_p_death_if_failure(self):
-        return np.mean([self.p_death_if_failure(agent) for agent in self.agents])
+    def IR(self, agent):
+        return self.p_death_if_failure(agent) * self.p_failure(agent)
+
+    def avg_IR(self):
+        return np.mean([self.IR(agent) for agent in self.agents])
 
     def f_N(self, x):
-        return binom.pdf(x, self.N_agents, self.avg_p_death_if_failure())
+        p = self.avg_IR()
+        return binom.pmf(x, self.N_agents, p)
 
     def F_N(self, x):
-        return binom.cdf(x, self.N_agents, self.avg_p_death_if_failure())
+        return binom.cdf(x, self.N_agents, self.avg_IR())
 
     def P_N(self, x):
         return 1 - self.F_N(x)
-
-    def IR(self, agent):
-        return self.p_death_if_failure(agent) * self.p_failure(agent)
 
     def AWR(self):
         "The average weighted risk. Area aspects are included in the IR function"
         return sum([self.IR(agent) for agent in self.agents])
 
-    def SRI(self):
-        pass
+    def SRI(self, area: float, n: int = None, IR: float = None, T: float = 1) -> float:
+        """
+        Scaled Risk Integral in (person + person^2) / (acre * step). 
+        This is usally expressed per million year instead of step, so a conversion factor is required
+
+        :param float area: total area of interest
+        :param int n: number of people occupying the area, defaults to None
+        :param float IR: average individual risk in the area during the time of interest, defaults to None
+        :param float T: fraction of time the area is occupied by n people, defaults to 1
+        :return float: Scaled Risk Integral in (person + person^2) / (acre * step)
+        """
+        n = n or self.N_agents
+        IR = IR or self.avg_IR()
+        population_factor = (n + n * n) / 2
+        return (population_factor * T * IR) / area
 
     def FN_curve(self):
         pass
@@ -272,7 +286,7 @@ class FloodRiskModel(RiskModel):
 
     @override
     def p_failure(self, agent):
-        return self.model.floods_per_year * self.model.years_per_step 
+        return self.model.floods_per_year * self.model.years_per_step
 
     @override
     def p_death_if_failure(self, agent):

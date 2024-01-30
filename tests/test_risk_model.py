@@ -10,7 +10,7 @@ class SimpleModel(Model):
     def __init__(self, floods_per_year=1 / 100, years_per_step=0.25):
         super().__init__()
         self.floods_per_year = floods_per_year
-        self.years_per_step = 0.25
+        self.years_per_step = years_per_step
 
 
 class SimpleAgent(Agent):
@@ -31,7 +31,8 @@ risk_model = FloodRiskModel(model, agents, [SimpleAgent])
 
 IR_1 = 0.002469694294162453  # 0.9878777176649811 / 100 / 4
 IR_2 = 0.002497736792314788  # 0.9990947169259152 / 100 / 4
-P_AVG = (0 + 0.9878777176649811 + 0.9990947169259152) / 3
+P_AVG = 0.6623241448636321  # (0 + 0.9878777176649811 + 0.9990947169259152) / 3
+IR_AVG = 0.0016558103621590802 # P_AVG / 100 / 4
 
 class TestRiskModel:
     def test_simple_setup(self):
@@ -59,8 +60,9 @@ class TestRiskModel:
     def test_AWR(self):
         assert risk_model.AWR() == IR_1 + IR_2
 
-    def test_p_avt(self):
-        assert risk_model.avg_p_death_if_failure() == P_AVG
+    def test_p_avg(self):
+        assert risk_model.avg_IR() == IR_AVG 
 
     def test_fN(self):
-        assert risk_model.f_N(1e-3) == P_AVG ** (1e-3) * (1 - P_AVG) ** (1)
+        expected_2 = IR_AVG ** (2) * (1 - IR_AVG) ** (1) * 3
+        assert risk_model.f_N(2) == expected_2
