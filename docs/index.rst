@@ -10,7 +10,7 @@ Welcome to Flood Adaptation's documentation!
    :maxdepth: 4
    :caption: Contents:
 
-   readme
+   intro
    modules
 
 
