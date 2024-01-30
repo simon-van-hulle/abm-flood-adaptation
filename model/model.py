@@ -55,7 +55,7 @@ class AdaptationModel(Model):
     """
     The main model running the simulation. Extention of the :class:`mesa.Model` class. It sets up the network of household agents,
     simulates their behavior, and collects data. The network type can be adjusted based on study requirements.
-    
+
     :param int seed: seed for the random number generator
     :param Wizard wizard: wizard object containing all magic numbers
     :param float adaptation_cost: cost of full adaptation to a flood
@@ -143,8 +143,6 @@ class AdaptationModel(Model):
         # Add government
         self.schedule.add(Government(unique_id=number_of_households + 1, model=self, households=households))
 
-        # You might want to create other agents here, e.g. insurance agents.
-
         # Data collection setup to collect data
         model_metrics = {
             "TotalAdapted": self.total_adapted_households,
@@ -153,7 +151,6 @@ class AdaptationModel(Model):
             "AdaptationCost": "adaptation_cost",
             "InformationAbundance": "information_abundance",
             "SocietalRisk": "societal_risk",
-            # ... other reporters ...
         }
 
         agent_metrics = {
@@ -171,14 +168,16 @@ class AdaptationModel(Model):
             "InformationBudget": "information_budget",
             # "FriendsCount": lambda a: a.count_friends(radius=1),
             "location": "location",
-            # ... other reporters ...
         }
-        # set up the data collector
+
         self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
 
     def initialize_network(self) -> nx.Graph:
         """
         Initialize and return the social network graph based on the provided network type using pattern matching.
+
+        :raises ValueError: If provided network type is not implemented
+        :return nx.Graph: Graph object for the network representation
         """
         if self.network == "erdos_renyi":
             return nx.erdos_renyi_graph(
@@ -206,9 +205,12 @@ class AdaptationModel(Model):
                 f"'erdos_renyi', 'barabasi_albert', 'watts_strogatz', and 'no_network'"
             )
 
-    def initialize_maps(self, flood_map_choice):
+    def initialize_maps(self, flood_map_choice:str) -> None:
         """
         Initialize and set up the flood map related data based on the provided flood map choice.
+
+        :param str flood_map_choice: Chosen flood map (can be "harvey", "100yr", or "500yr")
+        :raises ValueError: In case flood map is not implemented
         """
         # Define paths to flood maps
         flood_map_paths = {
@@ -237,10 +239,20 @@ class AdaptationModel(Model):
 
         self.floods_per_year = {"harvey": 1 / 50, "100yr": 1 / 100, "500yr": 1 / 500}[flood_map_choice]
 
-    def get_households(self):
+    def get_households(self)->list[Households]:
+        """
+        Get all agents of type Household
+
+        :return list[Households]: all agents in the model of type Household
+        """
         return [agent for agent in self.schedule.agents if isinstance(agent, Households)]
 
-    def get_government(self):
+    def get_government(self) -> Government:
+        """
+        Get the government agent
+
+        :return Government: the government agent
+        """
         for agent in self.schedule.agents:
             if isinstance(agent, Government):
                 return agent
