@@ -22,16 +22,11 @@ def set_initial_values(input_data, parameter, seed):
     """
     Function to set the values based on the distribution shown in the input data for each parameter.
     The input data contains which percentage of households has a certain initial value.
-    
-    Parameters
-    ----------
-    input_data: the dataframe containing the distribution of paramters
-    parameter: parameter name that is to be set
-    seed: agent's seed
-    
-    Returns
-    -------
-    parameter_set: the value that is set for a certain agent for the specified parameter 
+
+    :param DataFrame input_data: the dataframe containing the distribution of paramters
+    :param str parameter: parameter name that is to be set
+    :param int seed: agent's seed
+    :return _type_: the value that is set for a certain agent for the specified parameter 
     """
     parameter_set = 0
     parameter_data = input_data.loc[(input_data.parameter == parameter)] # get the distribution of values for the specified parameter
