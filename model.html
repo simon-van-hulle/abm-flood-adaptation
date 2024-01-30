@@ -349,82 +349,104 @@ This is usally expressed per million year instead of step, so a conversion facto
 Functions get called by the Model and Agent class.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.calculate_basic_flood_damage">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">calculate_basic_flood_damage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_depth</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#calculate_basic_flood_damage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.calculate_basic_flood_damage" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">calculate_basic_flood_damage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#calculate_basic_flood_damage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.calculate_basic_flood_damage" title="Link to this definition"></a></dt>
 <dd><p>To get flood damage based on flood depth of household
 from de Moer, Huizinga (2017) with logarithmic regression over it.
 If flood depth &gt; 6m, damage = 1.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
-<p>flood_depth : flood depth as given by location within model domain</p>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
-<p>flood_damage : damage factor between 0 and 1</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flood_depth</strong> (<em>float</em>) – flood depth as given by location within model domain</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated damage between 0 and 1</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.generate_random_location_within_map_domain">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">generate_random_location_within_map_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#generate_random_location_within_map_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.generate_random_location_within_map_domain" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">generate_random_location_within_map_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#generate_random_location_within_map_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.generate_random_location_within_map_domain" title="Link to this definition"></a></dt>
 <dd><p>Generate random location coordinates within the map domain polygon.</p>
-<section id="id1">
-<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>x, y: lists of location coordinates, longitude and latitude</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Return tuple[float, float]<span class="colon">:</span></dt>
+<dd class="field-odd"><p>lists of location coordinates, longitude and latitude</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.get_flood_depth">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corresponding_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#get_flood_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_depth" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corresponding_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#get_flood_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_depth" title="Link to this definition"></a></dt>
 <dd><p>To get the flood depth of a specific location within the model domain.
 Households are placed randomly on the map, so the distribution does not follow reality.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
-<p>corresponding_map: flood map used
-location: household location (a Shapely Point) on the map
-band: band from the flood map</p>
-</section>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<p>depth: flood depth at the given location</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>corresponding_map</strong> (<em>str</em>) – flood map used</p></li>
+<li><p><strong>location</strong> (<em>Point</em>) – household location (a Shapely Point) on the map</p></li>
+<li><p><strong>band</strong> (<em>np.ndarray</em>) – band from the flood map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flood Depth</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.get_flood_map_data">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#get_flood_map_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_map_data" title="Link to this definition"></a></dt>
-<dd><p>Getting the flood map characteristics.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<p>flood_map: flood map in tif format</p>
-</section>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<p>band, bound_l, bound_r, bound_t, bound_b: characteristics of the tif-file</p>
-</section>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_flood_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flood_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#get_flood_map_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_flood_map_data" title="Link to this definition"></a></dt>
+<dd><p>Get the characteristics of the flood map data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flood_map</strong> (<em>str</em>) – flood map in tif format</p>
+</dd>
+<dt class="field-even">Return tuple[float, float, float, float]<span class="colon">:</span></dt>
+<dd class="field-even"><p>characteristics of the tif-file</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.get_position_flood">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_position_flood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bound_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#get_position_flood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_position_flood" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">get_position_flood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bound_l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/model/functions.html#get_position_flood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.get_position_flood" title="Link to this definition"></a></dt>
 <dd><p>To generater the position on flood map for a household.
 Households are placed randomly on the map, so the distribution does not follow reality.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<p>bound_l, bound_r, bound_t, bound_b, img: characteristics of the flood map data (.tif file)
-seed: seed to generate the location on the map</p>
-</section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
-<p>x, y: location on the map
-row, col: location within the tif-file</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bound_l</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_r</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_t</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>bound_b</strong> (<em>float</em>) – characteristics of the flood map data</p></li>
+<li><p><strong>img</strong> (<em>str</em>) – characteristics of the flood map .tif file</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – seed to generate the location on the map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return tuple[float, float, int, int]<span class="colon">:</span></dt>
+<dd class="field-even"><p>location on the map and location within the tif-file</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.lognormal_cdf">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">lognormal_cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#lognormal_cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.lognormal_cdf" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">lognormal_cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#lognormal_cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.lognormal_cdf" title="Link to this definition"></a></dt>
+<dd><p>Cumulative density function of the lognormal distribution. Integral of the lognormal probability density function 
+from minus infinity to x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – Upper bound of the pdf integral</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – mean of the lognormal distribution</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – standard deviation of the lognormal distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>cumulative density function P(X &lt;= x)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.set_initial_values">
@@ -439,7 +461,7 @@ The input data contains which percentage of households has a certain initial val
 <li><p><strong>seed</strong> (<em>int</em>) – agent’s seed</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return _type_<span class="colon">:</span></dt>
+<dt class="field-even">Return any<span class="colon">:</span></dt>
 <dd class="field-even"><p>the value that is set for a certain agent for the specified parameter</p>
 </dd>
 </dl>
@@ -447,13 +469,31 @@ The input data contains which percentage of households has a certain initial val
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.sigminv">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigminv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#sigminv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigminv" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigminv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#sigminv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigminv" title="Link to this definition"></a></dt>
+<dd><p>Inverse sigmoid function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – sigmoid function of the unknown variable</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>solution inverse sigmoid function</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="model.functions.sigmoid">
-<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigmoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model/functions.html#sigmoid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigmoid" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">model.functions.</span></span><span class="sig-name descname"><span class="pre">sigmoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/model/functions.html#sigmoid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#model.functions.sigmoid" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the sigmoid function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – input variable</p>
+</dd>
+<dt class="field-even">Return float<span class="colon">:</span></dt>
+<dd class="field-even"><p>sigmoid(x)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-model.model">
