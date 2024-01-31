@@ -1,6 +1,6 @@
 # Start Here
 
-Please visit the complete documentation at https://abm-flood-adaptation.readthedocs.io/en/latest
+Please visit the complete documentation at https://abm-flood-adaptation.readthedocs.io/en/latest. You can also build the documentation yourself (See section [Documentation](#documentation))
 
 ## Introduction
 This directory contains a minimal agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events in a social network context. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
@@ -52,14 +52,26 @@ abm-flood-adaptation <br>
 To ensure the model runs on your computer, please follow the following steps:
 1. Create a new virtual environment with your favourite environment manager. For example:
 ```bash
-python3 -m venv -n abm-flood python=3.12
+$ python3 -m venv -n abm-env python=3.12
+$ source abm-env/bin/activate
 ```
 2. Install the required packages. For example:
 ```bash
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
+3. Ensure the build is successful by running the minimal example
+```bash
+$ python3 analysis/minimal.py
+```
+4. You can now adapt the implementations in the analysis folder to adapt the model
 
+## Documentation
 
+You can either find the documentation at https://abm-flood-adaptation.readthedocs.io/en/latest or build the documentation yourself. For the latter, first ensure your environment is activated and sphinx is installed. Then run the following command from the main directory.
+```bash
+$ sphinx-build docs build
+```
+The documentation will be stored in the build folder and you can access it by opening `build/index.html` in your favourite browser.
 
 
 ## Extending the model
