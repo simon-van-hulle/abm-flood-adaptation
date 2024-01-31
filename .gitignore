@@ -1,8 +1,9 @@
 _modules/
+playground*
 
 # Additional things
 .DS_Store
-figures
+*figures
 *.npy
 *.pkl
 *.tar.gz

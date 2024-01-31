@@ -1,30 +1,55 @@
-# Flood Adaptation and Societal Risk
+# Start Here
 
-
-## Documentation
-
-Visit the documentation at https://abm-flood-adaptation.readthedocs.io/en/latest/
+Please visit the complete documentation at https://abm-flood-adaptation.readthedocs.io/en/latest
 
 ## Introduction
 This directory contains a minimal agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events in a social network context. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
 
 ## Installation
 To set up the project environment, follow these steps:
-1. Make sure you have installed a recent Python version, like 3.11 or 3.12.
-2. Install the latest Mesa version (2.1.5 or above) with `pip install -U mesa`
-2. Clone the repository to your local machine.
-3. Install required dependencies:
+1. Clone the repository to your local machine.
+2. Install required dependencies:
    ```bash
-   pip install -U geopandas shapely rasterio networkx
+   pip install -U mesa geopandas shapely rasterio networkx
    ```
 
-## File descriptions
-The `model` directory contains the actual Python code for the minimal model. It has the following files:
-- `agents.py`: Defines the `Households` agent class, each representing a household in the model. These agents have attributes related to flood depth and damage, and their behavior is influenced by these factors. This script is crucial for modeling the impact of flooding on individual households.
-- `functions.py`: Contains utility functions for the model, including setting initial values, calculating flood damage, and processing geographical data. These functions are essential for data handling and mathematical calculations within the model.
-- `model.py`: The central script that sets up and runs the simulation. It integrates the agents, geographical data, and network structures to simulate the complex interactions and adaptations of households to flooding scenarios.
-- `demo.ipynb`: A Jupyter notebook titled "Flood Adaptation: Minimal Model". It demonstrates running a model and analyzing and plotting some results.
-There is also a directory `input_data` that contains the geographical data used in the model. You don't have to touch it, but it's used in the code and there if you want to take a look.
+## Folder Structure
+
+abm-flood-adaptation
+├── analysis
+│ ├── build
+│ ├── make.bat
+│ ├── Makefile
+│ └── source
+├── analysis
+│ ├── `analyse.ipynb` (Main processing file for the results)
+│ ├── `demo.ipynb` (Legacy demonstration from the original model)
+│ ├── `minimal.py` (Minimal runnable simulation example)
+│ ├── `parametric.py` (Using EMA workbench to sweep parameter space and find batch solutions)
+│ └── `paths.py` (Utility to ensure correct path availability)
+├── docs
+│ └── ... (Builds the documentation)
+├── documents
+│ └── ... (Documents and articles related to the work)
+├── input_data
+│ ├── floodmaps (.tif files)
+│ ├── floodplain (.cpg, .dbf, .prj, .shp, .shx filex)
+│ └── model_domain (Houston shapes)
+├── model
+│ ├── `functions.py`(Functions related to the flood model) 
+│ ├── `agents.py` (Agent classes and implementation of the RiskModel)
+│ ├── `model.py` (Model implementation)
+│ ├── `server.py` (Server description for running visualisations)
+│ └── `utils.py` (Utility functions)
+├── output
+│ └── ... (Stores images, output data and other results)
+├── tests
+│ ├── `test_agent.py` (Testing simple agent functionality)
+│ └── `test_risk_model` (Testing solely the implementation of the risk model)
+├── README.md (This readme)
+├── requirements.txt 
+└── ... (dot-files for setup and documentation)
 
 ## Usage
-Threat this as a starting point, and feel free to modify, add or remove any components and files you find useful.
+Feel free to extend the model at will and play around with anything. An Reusable Building Block of the Risk Model is also available at https://www.agentblocks.org/
+
