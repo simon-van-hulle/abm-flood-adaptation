@@ -6,12 +6,23 @@ Please visit the complete documentation at https://abm-flood-adaptation.readthed
 This directory contains a minimal agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events in a social network context. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
 
 ## Installation
-To set up the project environment, follow these steps:
+To set up the project environment and ensure the model runs, follow these steps:
 1. Clone the repository to your local machine.
-2. Install required dependencies:
-   ```bash
-   pip install -U mesa geopandas shapely rasterio networkx
-   ```
+2. Create a new virtual environment with your favourite environment manager. For example:
+```bash
+$ python3 -m venv -n abm-env python=3.12
+$ source abm-env/bin/activate
+```
+3. Install the required packages. For example:
+```bash
+$ pip install -r requirements.txt
+```
+4. Ensure the build is successful by running the minimal example
+```bash
+$ python3 analysis/minimal.py
+```
+5. You can now adapt the implementations in the analysis folder to adapt the model
+
 
 ## Folder Structure
 
@@ -47,23 +58,6 @@ abm-flood-adaptation <br>
 
 
 
-## Usage
-
-To ensure the model runs on your computer, please follow the following steps:
-1. Create a new virtual environment with your favourite environment manager. For example:
-```bash
-$ python3 -m venv -n abm-env python=3.12
-$ source abm-env/bin/activate
-```
-2. Install the required packages. For example:
-```bash
-$ pip install -r requirements.txt
-```
-3. Ensure the build is successful by running the minimal example
-```bash
-$ python3 analysis/minimal.py
-```
-4. You can now adapt the implementations in the analysis folder to adapt the model
 
 ## Documentation
 
