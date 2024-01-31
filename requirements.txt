@@ -1,6 +1,6 @@
 ema_workbench==2.5.0
 geopandas==0.12.1
-matplotlib==3.5.1
+matplotlib>=3.5.1
 mesa==2.2.4
 networkx==2.8.8
 numpy>=1.21.5
@@ -12,3 +12,4 @@ seaborn>=0.13.2
 Shapely>=1.8.5.post1
 myst_parser>=2.0.0
 sphinx_rtd_theme>=2.0.0
+pandas

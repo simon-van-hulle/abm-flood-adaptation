@@ -48,5 +48,21 @@ abm-flood-adaptation <br>
 
 
 ## Usage
+
+To ensure the model runs on your computer, please follow the following steps:
+1. Create a new virtual environment with your favourite environment manager. For example:
+```bash
+python3 -m venv -n abm-flood python=3.12
+```
+2. Install the required packages. For example:
+```bash
+pip install -r requirements.txt
+```
+
+
+
+
+## Extending the model
+
 Feel free to extend the model at will and play around with anything. An Reusable Building Block of the Risk Model is also available at https://www.agentblocks.org/
 
