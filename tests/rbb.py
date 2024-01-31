@@ -193,10 +193,6 @@ class RiskModel:
         sigma = self.sigma_N()
         return E + sigma * self.k_aversion_factor
 
-    def societal_risk_exceeds_threshold(self, method, threshold):
-        if method == "ExpectedValue":
-            return self.AWR() > threshold
-
     def check_threshold(
         self,
         threshold: Callable | float,

@@ -417,10 +417,6 @@ class RiskModel:
         sigma = self.sigma_N()
         return E + sigma * self.k_aversion_factor
 
-    def societal_risk_exceeds_threshold(self, method, threshold):
-        if method == "ExpectedValue":
-            return self.AWR() > threshold
-
     def check_threshold(
         self,
         threshold: Callable | float,
@@ -564,7 +560,6 @@ class Government(Agent):
 
         if "subsidy" in self.model.government_adaptation_strategies:
             
-            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
             if self.risk_model.check_threshold(0.1 * self.n_households, self.risk_model.AWR):
                 self.model.subsidy_policy = (
                     lambda household: self.model.adaptation_cost * 0.5
