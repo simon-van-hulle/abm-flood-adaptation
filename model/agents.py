@@ -4,6 +4,7 @@ from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
 from scipy.stats import binom
+from scipy.integrate import quad
 from typing import override
 
 # Import functions from functions.py
@@ -111,40 +112,51 @@ class Households(Agent):
     @property
     def flood_damage_estimated(self) -> float:
         """
-        _summary_
+        Estimated damage is the theoretical flood map value adjusted with a factor between 0 and 1
 
-        :return float: _description_
+        :return float: estimated flood damage
         """
         return self.flood_damage_theoretical * self.flood_damage_estimation_factor
 
     @property
-    def flood_damage_actual(self):
-        "Factor between 0 and 1"
+    def flood_damage_actual(self) -> float:
+        """
+        Real flood damage with the actual flood depth
+
+        :return float: actual flood damage
+        """
         return calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
 
     @property
-    def friends(self):
+    def friends(self) -> list:
+        """
+        Gets a list of friends of the agent.
+
+        :return list: al neighbours in the social graph
+        """
         return self.model.grid.get_neighbors(self.pos, include_center=False)
 
     # Function to count friends who can be influencial.
-    def count_friends(self, radius):
-        """Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial"""
+    def count_friends(self, radius: int = 1) -> int:
+        """
+        Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial
+
+        :param int radius: Number of steps away from the agent (in social connections), defaults to 1
+        :return int: number of friends within the given radius
+        """
         friends = self.model.grid.get_neighborhood(self.pos, include_center=False, radius=radius)
         return len(friends)
 
-    def save(self):
-        # Add some savings based on the value of the house
+    def save(self) -> None:
+        """
+        Save money for adaptation, in accordance with saving behaviour and income
+        """
         self.savings += random.normalvariate(*self.wizard.avg_std_savings_per_step_vs_house) * self.house_value
 
-        pass
-
-    def inform(self):
-        # Look at government information
-        # Level of trust for government
-
-        # Update estimated damage
-        # Update estimated likelihood
-
+    def inform(self) -> None:
+        """
+        Look at government information and update estimated damage and likelihood (getting informed about the situation)
+        """
         self.flood_damage_estimation_factor += (
             self.trustworthiness_of_government
             * self.model.information_abundance
@@ -152,17 +164,10 @@ class Households(Agent):
         )
         self.flood_damage_estimation_factor = max(self.flood_damage_estimation_factor, 0)
 
-    def interact(self):
-        # Talk with social network
-        # Talk with neighbours
-        # Level of trust in friend(s)
-
-        # Check if others adapted
-
-        # Update estimated damage
-        # Update estimated likelihood
-        # Update risk aversion,
-
+    def interact(self) -> None:
+        """
+        Interact with friends and update risk aversion, depending on the trustworthiness of friends
+        """
         for i, friend in enumerate(self.friends):
             trustworthiness = self.trustworthiness_of_friends[i]
             self.risk_aversion += trustworthiness * (friend.risk_aversion - self.risk_aversion)
@@ -183,11 +188,15 @@ class Households(Agent):
 
         pass
 
-    def do_adaptation(self):
+    def do_adaptation(self) -> None:
+        """
+        Logic for adaptation based on estimated flood damage and a random chance.
+        For the present model, adaptation is a binary decision - to make it more accurate there should be multiple adaptations strategies
+        """
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
 
-        # Should be a combination of flood_damage estimated,  savings and threshold
+        # Should be a combination of flood_damage estimated, savings and threshold
         # Also do something with the actual flood damage.
 
         estimated_money_damage = self.flood_damage_estimated * self.house_value
@@ -204,7 +213,10 @@ class Households(Agent):
             self.savings -= adaptation_cost  # Agent pays for adaptation
             self.government_subsidy_money += subsidy_money  # Government pays for adaptation
 
-    def flood_occurs(self):
+    def flood_occurs(self) -> None:
+        """
+        Flood occurs and damages the household. This function deals with implementing the results of that.
+        """
         self.flood_depth_actual = (
             random.uniform(*self.wizard.min_max_actual_depth_factor) * self.flood_depth_theoretical
         )
@@ -216,7 +228,10 @@ class Households(Agent):
             self.flood_damage_actual * random.normalvariate(*self.wizard.avg_std_flood_influence_risk_aversion),
         )
 
-    def step(self):
+    def step(self) -> None:
+        """
+        Perform a single step in the model.
+        """
         self.save()
         self.inform()
         self.interact()
@@ -225,26 +240,26 @@ class Households(Agent):
 
 ###########################################################################
 
-"""
-Some notes:
-    "The functions that do not use self can also be redefined outside the class for versatility towards better models"
-"""
-
-# Risk model
-
 
 class RiskModel:
     """
     A class that calculates the risk of flooding for the entire model.
-    * IR = Individual risk
-    * SR = Societal risk
-    * N = number of households
-    * AWR = Average Weighted Risk
-    * SRI = Scaled Risk Integral
-    * RI = Collective Risk Integral
+
+    :param list[Agent] agents: list of agents in the risk model
+    :param list[type] agent_type_filter: list of agent types to filter on, defaults to None
+    :param int k_aversion_factor: scaling factor for the risk function, defaults to 1
+    :param int alpha: scaling exponent for the risk integral function, defaults to 1
+    :param callable Cx_function: scaling function for the risk integral function, defaults to lambda x: 1
     """
 
-    def __init__(self, agents, agent_type_filter=None, alpha=1, k_aversion_factor=1, Cx_function=lambda x: 1):
+    def __init__(
+        self,
+        agents: Agent,
+        agent_type_filter: list[type] = None,
+        alpha: int = 1,
+        k_aversion_factor: int = 1,
+        Cx_function: callable = lambda x: 1,
+    ):
         self.agent_type_filter = agent_type_filter
         self.agents = agents
         if agent_type_filter is not None:
@@ -255,30 +270,85 @@ class RiskModel:
         self.k_aversion_factor = k_aversion_factor
         self.Cx_function = Cx_function  # The scaling function defaults to 1
 
-    def p_failure(self, agent):
+    def p_failure(self, agent: Agent):
+        """
+        Function that should be implemented by the inheriting risk model, to calculate the probability that the failure
+        of interest occurs for a given agent. Be aware of the time scale considered here. Best to work per step in the
+        model and scale the probability outside of the function.
+
+        :param Agnet agent: The agent for which the probability of failure should be calculated
+        :raises NotImplementedError: The inheriting risk model should implement this function
+        """
         raise NotImplementedError("The risk model requires a function for the probability of failure.")
 
-    def p_death_if_failure(self, agent):
+    def p_death_if_failure(self, agent: Agent):
+        """
+        Function to calculate the probability of death if a failure occurs for a given agent. Be aware of the time scale
+        The inheriting risk model should implement this function
+
+        :param Agent agent: The agent of interest
+        :raises NotImplementedError: The inheriting risk model should implement this function
+        """
         raise NotImplementedError("The risk model requires a function for the probability of death if a failure occurs")
 
-    def IR(self, agent):
+    def IR(self, agent: Agent) -> float:
+        r"""
+        Individual risk for a given agent
+        
+        .. math:: \mathit{IR} = P_{d|f}P_f
+
+        :param Agent agent: Agent of interest
+        :return float: risk for the agent to die in a given step
+        """
         return self.p_death_if_failure(agent) * self.p_failure(agent)
 
-    def avg_IR(self):
+    def avg_IR(self) -> float:
+        """
+        Average individual risk for all agents
+
+        :return float: Average risk for any agent to die in a given step
+        """
         return np.mean([self.IR(agent) for agent in self.agents])
 
-    def f_N(self, x):
+    def f_N(self, x: int) -> float:
+        """
+        Probability density function used to calculate the probability of x agents dying in a given step. This is an
+        approximation using the average individual risk and a binomial distribution.
+
+        :param int x: number of agents that die in a given step
+        :return float: probability of x agents dying in a given step
+        """
         p = self.avg_IR()
         return binom.pmf(x, self.N_agents, p)
 
-    def F_N(self, x):
+    def F_N(self, x: int) -> float:
+        """
+        Cumulative probability that less than x agents die in a given step. This is an approximation using the average
+        individual risk and a binomial distribution.
+        
+        
+
+        :param int x: max number of agents to die
+        :return float: cumulative probability that less than x agents die in a given step
+        """
         return binom.cdf(x, self.N_agents, self.avg_IR())
 
-    def P_N(self, x):
+    def P_N(self, x: int) -> float:
+        """
+        Probability that more than x agents die in a given step. This is an approximation using the average individual
+        risk and a binomial distribution.
+
+        :param int x: min number of agents to die
+        :return float: Probability of more than x agents dying in a given step
+        """
         return 1 - self.F_N(x)
 
-    def AWR(self):
-        "The average weighted risk. Area aspects are included in the IR function"
+    def AWR(self) -> float:
+        """
+        The average weighted risk. Area aspects are included in the IR function
+
+        :return float: AWR
+        """
         return sum([self.IR(agent) for agent in self.agents])
 
     def SRI(self, area: float, n: int = None, IR: float = None, T: float = 1) -> float:
@@ -297,11 +367,56 @@ class RiskModel:
         population_factor = (n + n * n) / 2
         return (population_factor * T * IR) / area
 
-    def FN_curve(self):
-        pass
+    def FN_curve(self) -> None:
+        raise NotImplementedError
 
-    def RI(self):
-        pass
+    def RI(self, alpha: int = None, Cx_function: callable = None) -> float:
+        r"""
+        Risk Integral at the current time. This is the integral of the risk function over the number of agents.
+        If alpha=1 and Cx_function=1, this is the same as the expected value of deaths.
+        
+        .. math:: RI = \int_0^N x^\alpha \cdot C(x) \cdot f_N(x) \cdot dx
+
+        :param int alpha: scaling exponent for risk integral, using model attribute if None
+        :param callable Cx_function: scaling function for risk integral, using model attribute if None
+        :return float: RI
+        """
+        alpha = alpha or self.alpha
+        Cx_function = Cx_function or self.Cx_function
+
+        risk_function = lambda x: x**self.alpha * self.f_N(x) * self.Cx_function(x)
+        result, _ = quad(risk_function, 0, self.N_agents)
+        return result
+
+    def E_N(self) -> float:
+        """
+        Expected number of deaths at the current time. This is the same as the risk integral if alpha=1 and Cx_function=1.
+
+        :return float: Expected number of deaths
+        """
+        return self.RI(1, lambda x: 1)
+
+    def sigma_N(self)-> float:
+        r"""
+        Standard deviation of the number of deaths at the current time.
+
+        :return float: :math:`\sigma(N)`
+        """
+        E = self.E_N()
+        E2 = self.RI(2, lambda x: 1)
+        return np.sqrt(E2 - E**2)
+
+    def total_risk(self) -> float:
+        r"""
+        Total Risk
+        
+        .. math:: \mathit{TR} = \mathbb{E}(N) + k \cdot \sigma(N)
+
+        :return float: _description_
+        """
+        E = self.E_N()
+        sigma = self.sigma_N()
+        return E + sigma * self.k_aversion_factor
 
     def societal_risk_exceeds_threshold(self, method, threshold):
         if method == "ExpectedValue":
@@ -332,7 +447,7 @@ class FloodRiskModel(RiskModel):
 class Government(Agent):
     """
     A government agent that is responsible for adaptation policies.
-    
+
     :param int unique_id: unique identifier for the agent
     :param AdaptationModel model: the model the agent belongs to
     :param list households: list of households in the model

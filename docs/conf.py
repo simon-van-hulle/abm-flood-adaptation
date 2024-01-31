@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
+    "sphinx.ext.mathjax",
     "myst_parser",
 ]
 
@@ -49,7 +50,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # autodoc_mock_imports = ["geopandas" ,"shapely"]
 autodoc_mock_imports = ["scipy", "mesa"]
-                        # , 'scipy', 'mesa', 'rasterio']
+# , 'scipy', 'mesa', 'rasterio']
 
 # -- Options for HTML output -------------------------------------------------
 

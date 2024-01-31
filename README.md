@@ -17,11 +17,6 @@ To set up the project environment, follow these steps:
 
 abm-flood-adaptation <br>
 ├── analysis <br>
-│   ├── build <br>
-│   ├── make.bat <br>
-│   ├── Makefile <br>
-│   └── source <br>
-├── analysis <br>
 │   ├── `analyse.ipynb` (Main processing file for the results) <br>
 │   ├── `demo.ipynb` (Legacy demonstration from the original model) <br>
 │   ├── `minimal.py` (Minimal runnable simulation example) <br>
@@ -46,8 +41,8 @@ abm-flood-adaptation <br>
 ├── tests <br>
 │   ├── `test_agent.py` (Testing simple agent functionality) <br>
 │   └── `test_risk_model` (Testing solely the implementation of the risk model) <br>
-├── README.md (This readme) <br>
-├── requirements.txt  <br>
+├── `README.md` (This readme) <br>
+├── `requirements.txt`  <br>
 └── ... (dot-files for setup and documentation) <br>
 
 

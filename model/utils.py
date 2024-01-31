@@ -23,7 +23,7 @@ def LOG(*strings, separator: str = " ") -> None:
     """
     Utility to print a log message.
 
-    :param str separator: separator to use between the *strings, defaults to " "
+    :param str separator: separator to use between the \*strings, defaults to " "
     """
     message = separator.join(["[LOG]:", *strings])
     print(message)
