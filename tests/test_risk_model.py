@@ -1,7 +1,3 @@
-import sys
-
-sys.path.insert(0, "/home/simon/Documents/Study/Delft/AE-MSc1/ABM/project/abm-flood-adaptation")
-
 
 import pytest
 from scipy.stats import binom
