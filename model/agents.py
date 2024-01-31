@@ -432,11 +432,28 @@ class FloodRiskModel(RiskModel):
         self.model = model
 
     @override
-    def p_failure(self, agent):
+    def p_failure(self, agent: Households) -> float:
+        """
+        The probability of failure for the flood model is equal to the probability
+        of flooding during a single step. This is simply the number of floods per year
+        multiplied by the number of years per step.
+
+        :param Houshold agent: The agent of interest is a household
+        :return float: probability of failure
+        """
         return self.model.floods_per_year * self.model.years_per_step
 
     @override
-    def p_death_if_failure(self, agent):
+    def p_death_if_failure(self, agent: Households) -> float:
+        """
+        The probability of death if a flood occurs is approximated with a 
+        lognormal distribution with a mean of 0.5 and a standard deviation of 0.8.
+        These values are preliminary estimates that are NOT based on any data.
+        Needs to be updated with real data.
+
+        :param Households agent: Household agent of interest
+        :return float: probability of death if a flood occurs
+        """
         return lognormal_cdf(agent.flood_depth_theoretical, 0.5, 0.8)
 
 
