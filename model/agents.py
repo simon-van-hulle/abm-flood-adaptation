@@ -4,8 +4,7 @@ from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
 from scipy.stats import binom
-from scipy.integrate import quad
-from typing import override
+from typing import override, Callable
 
 # Import functions from functions.py
 from .functions import *
@@ -249,7 +248,7 @@ class RiskModel:
     :param list[type] agent_type_filter: list of agent types to filter on, defaults to None
     :param int k_aversion_factor: scaling factor for the risk function, defaults to 1
     :param int alpha: scaling exponent for the risk integral function, defaults to 1
-    :param callable Cx_function: scaling function for the risk integral function, defaults to lambda x: 1
+    :param Callable Cx_function: scaling function for the risk integral function, defaults to lambda x: 1
     """
 
     def __init__(
@@ -258,7 +257,7 @@ class RiskModel:
         agent_type_filter: list[type] = None,
         alpha: int = 1,
         k_aversion_factor: int = 1,
-        Cx_function: callable = lambda x: 1,
+        Cx_function: Callable = lambda x: 1,
     ):
         self.agent_type_filter = agent_type_filter
         self.agents = agents
@@ -294,7 +293,7 @@ class RiskModel:
     def IR(self, agent: Agent) -> float:
         r"""
         Individual risk for a given agent
-        
+
         .. math:: \mathit{IR} = P_{d|f}P_f
 
         :param Agent agent: Agent of interest
@@ -325,8 +324,8 @@ class RiskModel:
         """
         Cumulative probability that less than x agents die in a given step. This is an approximation using the average
         individual risk and a binomial distribution.
-        
-        
+
+
 
         :param int x: max number of agents to die
         :return float: cumulative probability that less than x agents die in a given step
@@ -345,7 +344,7 @@ class RiskModel:
 
     def AWR(self) -> float:
         """
-        The average weighted risk. Area aspects are included in the IR function
+        The aggregated weighted risk. Area aspects are included in the IR function
 
         :return float: AWR
         """
@@ -370,22 +369,22 @@ class RiskModel:
     def FN_curve(self) -> None:
         raise NotImplementedError
 
-    def RI(self, alpha: int = None, Cx_function: callable = None) -> float:
+    def RI(self, alpha: int = None, Cx_function: Callable = None) -> float:
         r"""
         Risk Integral at the current time. This is the integral of the risk function over the number of agents.
         If alpha=1 and Cx_function=1, this is the same as the expected value of deaths.
-        
+
         .. math:: RI = \int_0^N x^\alpha \cdot C(x) \cdot f_N(x) \cdot dx
 
         :param int alpha: scaling exponent for risk integral, using model attribute if None
-        :param callable Cx_function: scaling function for risk integral, using model attribute if None
+        :param Callable Cx_function: scaling function for risk integral, using model attribute if None
         :return float: RI
         """
         alpha = alpha or self.alpha
         Cx_function = Cx_function or self.Cx_function
 
-        risk_function = lambda x: x**self.alpha * self.f_N(x) * self.Cx_function(x)
-        result, _ = quad(risk_function, 0, self.N_agents)
+        risk_function = lambda x: x**alpha * self.f_N(x) * Cx_function(x)
+        result = sum(risk_function(i) for i in range(self.N_agents))
         return result
 
     def E_N(self) -> float:
@@ -396,7 +395,7 @@ class RiskModel:
         """
         return self.RI(1, lambda x: 1)
 
-    def sigma_N(self)-> float:
+    def sigma_N(self) -> float:
         r"""
         Standard deviation of the number of deaths at the current time.
 
@@ -409,7 +408,7 @@ class RiskModel:
     def total_risk(self) -> float:
         r"""
         Total Risk
-        
+
         .. math:: \mathit{TR} = \mathbb{E}(N) + k \cdot \sigma(N)
 
         :return float: _description_
@@ -421,6 +420,43 @@ class RiskModel:
     def societal_risk_exceeds_threshold(self, method, threshold):
         if method == "ExpectedValue":
             return self.AWR() > threshold
+
+    def check_threshold(
+        self,
+        threshold: Callable | float,
+        risk_method: Callable = None,
+        values: list[float]=None,
+        comparator: Callable=lambda risk, threshold: risk < threshold,
+        **method_kwargs
+    ) -> bool:
+        """
+        Versatile method for checking whether a given risk measure agrees with 
+        a given threshold. The threshold can be a callable that takes the number of 
+        fatalities or a fixed value. The risk measure must be a callable and defaults
+        to total risk. The risk measure is evaluated at every value in the values and
+        compared to the threshold using the comparator function. 
+
+        :param Callable | float threshold: function to give threshold at input value, or constant threshold
+        :param Callable risk_method: method to use to get the risk measure, self.total_risk if None
+        :param list[float] values: Values to evaluate the risk measure at, defaults to None
+        :param Callable comparator: Function to compare risk and threshold: return True if passing, defaults to risk < threshold
+        :return bool: Whether the risk measure agrees with the threshold
+        """
+        risk_method = risk_method or self.total_risk
+        vals = values if hasattr(values, "__len__") else list([values])
+        threshold_func = threshold if callable(threshold) else lambda val: threshold
+
+        check = True
+        for val in vals:
+            if val is not None:
+                risk_measure = risk_method(val, **method_kwargs)
+            else:
+                risk_measure = risk_method(**method_kwargs)
+
+            threshold_val = threshold_func(val)
+            check *= comparator(risk_measure, threshold_val)
+
+        return bool(check)
 
 
 # Specific  functions for the flood model
@@ -446,7 +482,7 @@ class FloodRiskModel(RiskModel):
     @override
     def p_death_if_failure(self, agent: Households) -> float:
         """
-        The probability of death if a flood occurs is approximated with a 
+        The probability of death if a flood occurs is approximated with a
         lognormal distribution with a mean of 0.5 and a standard deviation of 0.8.
         These values are preliminary estimates that are NOT based on any data.
         Needs to be updated with real data.
@@ -516,10 +552,6 @@ class Government(Agent):
 
     def update_policy(self):
         # Update policies in the model based on societal risk
-
-        # How much info do you provide?
-
-        # update information_abundance
         # TODO:THIS IS MAGIC - FIX THE NUMBERS
 
         if "information" in self.model.government_adaptation_strategies:
@@ -531,7 +563,9 @@ class Government(Agent):
             )
 
         if "subsidy" in self.model.government_adaptation_strategies:
-            if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
+            
+            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.01 * self.n_households):
+            if self.risk_model.check_threshold(0.1 * self.n_households, self.risk_model.AWR):
                 self.model.subsidy_policy = (
                     lambda household: self.model.adaptation_cost * 0.5
                     if household.savings < self.model.adaptation_cost
@@ -541,11 +575,6 @@ class Government(Agent):
             else:
                 self.model.subsidy_policy = lambda household: 0
 
-            # if self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.1 * self.n_households):
-            #     self.model.subsidy_policy =  lambda household :  self.model.adaptation_cost * 1.0 if household.savings < self.model.adaptation_cost else 0
-
-            # elif self.risk_model.societal_risk_exceeds_threshold("ExpectedValue", 0.05 * self.n_households):
-            #     self.model.subsidy_policy = lambda household :  self.model.adaptation_cost * 0.5 if household.savings < self.model.adaptation_cost else 0
 
         if "dikes" in self.model.government_adaptation_strategies:
             pass
