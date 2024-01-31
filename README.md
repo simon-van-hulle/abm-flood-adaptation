@@ -15,42 +15,40 @@ To set up the project environment, follow these steps:
 
 ## Folder Structure
 
-| abm-flood-adaptation
-| ├── analysis
-| │ ├── build
-| │ ├── make.bat
-| │ ├── Makefile
-| │ └── source
-| ├── analysis
-| │ ├── `analyse.ipynb` (Main processing file for the results)
-| │ ├── `demo.ipynb` (Legacy demonstration from the original model)
-| │ ├── `minimal.py` (Minimal runnable simulation example)
-| │ ├── `parametric.py` (Using EMA workbench to sweep parameter space and find batch solutions)
-| │ └── `paths.py` (Utility to ensure correct path availability)
-| ├── docs
-| │ └── ... (Builds the documentation)
-| ├── documents
-| │ └── ... (Documents and articles related to the work)
-| ├── input_data
-| │ ├── floodmaps (.tif files)
-| │ ├── floodplain (.cpg, .dbf, .prj, .shp, .shx filex)
-| │ └── model_domain (Houston shapes)
-| ├── model
-| │ ├── `functions.py`(Functions related to the flood model) 
-| │ ├── `agents.py` (Agent classes and implementation of the RiskModel)
-| │ ├── `model.py` (Model implementation)
-| │ ├── `server.py` (Server description for running visualisations)
-| │ └── `utils.py` (Utility functions)
-| ├── output
-| │ └── ... (Stores images, output data and other results)
-| ├── tests
-| │ ├── `test_agent.py` (Testing simple agent functionality)
-| │ └── `test_risk_model` (Testing solely the implementation of the risk model)
-| ├── README.md (This readme)
-| ├── requirements.txt 
-| └── ... (dot-files for setup and documentation)
-|
-|
+abm-flood-adaptation <br>
+├── analysis <br>
+│ ├── build <br>
+│ ├── make.bat <br>
+│ ├── Makefile <br>
+│ └── source <br>
+├── analysis <br>
+│ ├── `analyse.ipynb` (Main processing file for the results) <br>
+│ ├── `demo.ipynb` (Legacy demonstration from the original model) <br>
+│ ├── `minimal.py` (Minimal runnable simulation example) <br>
+│ ├── `parametric.py` (Using EMA workbench to sweep parameter space and find batch solutions) <br>
+│ └── `paths.py` (Utility to ensure correct path availability) <br>
+├── docs <br>
+│ └── ... (Builds the documentation) <br>
+├── documents <br>
+│ └── ... (Documents and articles related to the work) <br>
+├── input_data <br>
+│ ├── floodmaps (.tif files) <br>
+│ ├── floodplain (.cpg, .dbf, .prj, .shp, .shx filex) <br>
+│ └── model_domain (Houston shapes) <br>
+├── model <br>
+│ ├── `functions.py`(Functions related to the flood model)  <br>
+│ ├── `agents.py` (Agent classes and implementation of the RiskModel) <br>
+│ ├── `model.py` (Model implementation) <br>
+│ ├── `server.py` (Server description for running visualisations) <br>
+│ └── `utils.py` (Utility functions) <br>
+├── output <br>
+│ └── ... (Stores images, output data and other results) <br>
+├── tests <br>
+│ ├── `test_agent.py` (Testing simple agent functionality) <br>
+│ └── `test_risk_model` (Testing solely the implementation of the risk model) <br>
+├── README.md (This readme) <br>
+├── requirements.txt  <br>
+└── ... (dot-files for setup and documentation) <br>
 
 
 
