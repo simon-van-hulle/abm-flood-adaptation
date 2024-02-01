@@ -22,14 +22,16 @@ from ema_workbench import (
     save_results,
     ema_logging,
     Policy,
+    Samplers
 )
 
 ## General Setup for the simulations
 HOUSEHOLDS = 200
 N_STEPS = 80
 REPLICATIONS = 100
-SCENARIOS = 20
-FILENAME = f"parametric-h{HOUSEHOLDS}-t{N_STEPS}-r{REPLICATIONS}-s{SCENARIOS}"
+SCENARIOS = 2
+# FILENAME = f"ff-parametric-h{HOUSEHOLDS}-t{N_STEPS}-r{REPLICATIONS}-s{SCENARIOS}"
+FILENAME = f"simple-parametric-h{HOUSEHOLDS}-t{N_STEPS}-r{REPLICATIONS}-s{SCENARIOS}"
 print(f"\n\nIMPORTANT: \nThe results of this run will be saved in {OUTPUT_DIR}/{FILENAME}.tar.gz. ENSURE THIS IS POSSIBLE!\n\n")
 
 ## Define the model function for EMA workbench
@@ -38,7 +40,7 @@ def model_adaptation(
     max_initial_savings=None,
     avg_savings_per_step_vs_house=None,
     avg_risk_aversion=None,
-    width_risk_aversion=None,
+    width_risk_aversion=0.4,
     output_dir="tmp",
     wizard=Wizard(),
 ):
@@ -68,6 +70,9 @@ def model_adaptation(
 ## Main model run
 
 if __name__ == "__main__":
+    SEED = 42
+    
+    
     ema_logging.log_to_stderr(ema_logging.INFO)
 
     model = ReplicatorModel("AdaptationModel", function=model_adaptation)
@@ -77,7 +82,7 @@ if __name__ == "__main__":
         RealParameter("avg_trustworthiness_government", -0.1, 0.4),
         RealParameter("avg_savings_per_step_vs_house", -0.1, 0.3),  #
         RealParameter("avg_risk_aversion", 0.25, 0.75),  #
-        RealParameter("width_risk_aversion", 0.25, 1.0),  #
+        # RealParameter("width_risk_aversion", 0.25, 1.0),  #
     ]
 
     # Define model outcomes
@@ -109,6 +114,6 @@ if __name__ == "__main__":
     ]
 
     # Run experiments with the aforementioned parameters and outputs
-    results = perform_experiments(models=model, scenarios=SCENARIOS, policies=policies)
+    results = perform_experiments(models=model, scenarios=SCENARIOS, policies=policies, uncertainty_sampling=Samplers.FF)
 
     save_results(results, f"{OUTPUT_DIR}/{FILENAME}.tar.gz")

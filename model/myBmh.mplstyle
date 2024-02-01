@@ -37,4 +37,4 @@ ytick.direction: in
 lines.markerfacecolor: eeeeee
 
 
-figure.figsize: 4, 3
+figure.figsize: 8, 3
