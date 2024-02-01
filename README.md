@@ -8,6 +8,9 @@ This directory contains a minimal agent-based model (ABM) implemented in Python,
 ## Installation
 To set up the project environment and ensure the model runs, follow these steps:
 1. Clone the repository to your local machine.
+```bash
+$ git clone https://github.com/simon-van-hulle/abm-flood-adaptation.git
+```
 2. Create a new virtual environment with your favourite environment manager. For example:
 ```bash
 $ python3 -m venv -n abm-env python=3.12

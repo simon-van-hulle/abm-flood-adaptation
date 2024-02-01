@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+sys.path.append('..')
 
 import pytest
 from scipy.stats import binom
@@ -123,15 +126,19 @@ class TestRiskModel:
 
     def test_check_threshold(self):
         """The thresholds here are chosen such that they are barely above the expected value"""
-        
+
         assert RISK_MODEL.check_threshold(threshold=EXP_N + 1, risk_method=RISK_MODEL.E_N)
         assert RISK_MODEL.check_threshold(threshold=TR + 1, risk_method=RISK_MODEL.total_risk)
         assert not RISK_MODEL.check_threshold(
             threshold=TR + 1, risk_method=RISK_MODEL.total_risk, comparator=lambda risk, threshold: risk > threshold
         )
-        
-        threshold_func = lambda val : binom.cdf(val, 3, IR_AVG) + 1e-3
-        assert RISK_MODEL.check_threshold(threshold=threshold_func, risk_method=RISK_MODEL.F_N, values=[1, 2, 3], )
+
+        threshold_func = lambda val: binom.cdf(val, 3, IR_AVG) + 1e-3
+        assert RISK_MODEL.check_threshold(
+            threshold=threshold_func,
+            risk_method=RISK_MODEL.F_N,
+            values=[1, 2, 3],
+        )
 
 
 if __name__ == "__main__":
