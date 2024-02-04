@@ -531,7 +531,7 @@ class Government(Agent):
         self.subsidy_budget = sum([household.government_subsidy_money for household in self.households])
         self.damage_budget = sum([household.government_damage_money for household in self.households])
 
-        self.total_budget = self.subsidy_budget + self.subsidy_budget + self.damage_budget
+        self.total_budget = self.information_budget + self.subsidy_budget + self.damage_budget
 
         return
 
